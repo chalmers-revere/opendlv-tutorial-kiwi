@@ -99,7 +99,7 @@ The third tutorial is to download a recording file and replay it on your local s
 
 _Prerequisites:_
 
-* [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/debian/#install-docker-ce)
+* [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [You need to install `docker-compose`](https://docs.docker.com/compose/install/#install-compose)
 * It is recommended to use the Chrome web-browser 68+.
 
