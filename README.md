@@ -25,8 +25,8 @@ The following components are installed on your Kiwi:
 9. Raspberry Pi Camera Module v2
 
 The following pictures provide an overview of the installed components on Kiwi.
-![top](https://github.com/chalmers-revere/2018-wasp-summer-school/raw/master/getting-started/images/front1.png)
-![bottom](https://github.com/chalmers-revere/2018-wasp-summer-school/raw/master/getting-started/images/bottom.png)
+![top](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/raw/master/kiwi-front.png)
+![bottom](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/raw/master/kiwi-bottom.png)
 
 All the sensors except for the camera are connected to a small PCB board and then to the BeagleBone Blue board. The camera is directly connected to the Raspberry Pi board. The two boards are connected by a USB cable, which is treated by both boards as a standard network connection. Both boards are also wireless-ready: in particular, the Raspberry Pi has WiFi capabilities, while the BeagleBone Blue has both WiFi and Bluetooth connectivity.
 
@@ -65,7 +65,7 @@ The second microservice is attaching to the shared memory area that contains the
 
 The third microservice is providing a web-application to visualize, record, and replay any messages that are exchanged among the running microservices.
 
-To simplify the distribution of microservices and the description how to configure and run them, we are using Docker. The listed microservices are pre-configured [here](https://raw.githubusercontent.com/chalmers-revere/2018-wasp-summer-school/master/getting-started/rpi-camera-x264-viewer-kiwi.yml) and already running on Kiwi.
+To simplify the distribution of microservices and the description how to configure and run them, we are using Docker. The listed microservices are pre-configured [here](https://raw.githubusercontent.com/chalmers-revere/opendlv-tutorial-kiwi/master/rpi-camera-x264-viewer-kiwi.yml) and already running on Kiwi.
 
 _Getting Started:_
 
@@ -161,5 +161,6 @@ _Where to go from here?_
 
 Now, you are able to use the camera from your Kiwi, visualize, record, and replay the data, and to send steering, acceleration, and deceleration commands.
 
-Next, you can investigate our template module that is running in Python to process video data and to send steering/acceleration/deceleration commands to Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/image-postprocessing-opencv-python) next to further descriptions how to develop and test your Python application.
+Next, you can investigate our template module that is running in Python to process video data and to send steering, acceleration, and deceleration commands to Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/image-postprocessing-opencv-python) next to further descriptions how to develop and test your Python application.
 
+Alternatively, you can investigate our template module that is running in C++ to process video data and to interface with Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/image-postprocessing-opencv-cpp) next to further descriptions how to develop and test your C++ application.
