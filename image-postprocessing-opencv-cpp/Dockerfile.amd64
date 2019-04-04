@@ -16,16 +16,19 @@
 FROM chrberger/cluon-amd64:latest as builder
 MAINTAINER Christian Berger "christian.berger@gu.se"
 
-RUN echo http://dl-4.alpinelinux.org/alpine/edge/main > /etc/apk/repositories && \
-    echo http://dl-4.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+RUN echo http://dl-4.alpinelinux.org/alpine/v3.8/main > /etc/apk/repositories && \
+    echo http://dl-4.alpinelinux.org/alpine/v3.8/community >> /etc/apk/repositories && \
     echo http://dl-4.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
     apk update && \
     apk --no-cache add \
         cmake \
         g++ \
+        git \
         opencv \
         opencv-dev \
-        make
+        make \
+        upx
+
 ADD . /opt/sources
 WORKDIR /opt/sources
 RUN mkdir build && \
@@ -37,8 +40,8 @@ RUN mkdir build && \
 FROM chrberger/cluon-amd64:latest
 MAINTAINER Christian Berger "christian.berger@gu.se"
 
-RUN echo http://dl-4.alpinelinux.org/alpine/edge/main > /etc/apk/repositories && \
-    echo http://dl-4.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+RUN echo http://dl-4.alpinelinux.org/alpine/v3.8/main > /etc/apk/repositories && \
+    echo http://dl-4.alpinelinux.org/alpine/v3.8/community >> /etc/apk/repositories && \
     echo http://dl-4.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
     apk update && \
     apk --no-cache add \
