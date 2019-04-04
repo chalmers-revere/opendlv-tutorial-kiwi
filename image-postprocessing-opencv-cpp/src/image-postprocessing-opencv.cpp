@@ -52,22 +52,6 @@ int32_t main(int32_t argc, char **argv) {
         if (sharedMemory && sharedMemory->valid()) {
             std::clog << argv[0] << ": Attached to shared memory '" << sharedMemory->name() << " (" << sharedMemory->size() << " bytes)." << std::endl;
 
-            // Create an OpenCV image header using the data in the shared memory.
-            IplImage *iplimage{nullptr};
-            if (VERBOSE) {
-                CvSize size;
-                size.width = WIDTH;
-                size.height = HEIGHT;
-
-                iplimage = cvCreateImageHeader(size, IPL_DEPTH_8U, 4 /* four channels: ARGB */);
-                sharedMemory->lock();
-                {
-                    iplimage->imageData = sharedMemory->data();
-                    iplimage->imageDataOrigin = iplimage->imageData;
-                }
-                sharedMemory->unlock();
-            }
-
             // Interface to a running OpenDaVINCI session; here, you can send and receive messages.
             cluon::OD4Session od4{static_cast<uint16_t>(std::stoi(commandlineArguments["cid"]))};
 
@@ -109,7 +93,8 @@ int32_t main(int32_t argc, char **argv) {
                     // the camera to provide the next frame. Thus, any
                     // computationally heavy algorithms should be placed outside
                     // lock/unlock.
-                    img = cv::cvarrToMat(iplimage);
+                    cv::Mat wrapped(HEIGHT, WIDTH, CV_8UC4, sharedMemory->data());
+                    img = wrapped.clone();
                 }
                 sharedMemory->unlock();
 
@@ -154,10 +139,6 @@ int32_t main(int32_t argc, char **argv) {
                 //opendlv::proxy::PedalPositionRequest ppr;
                 //ppr.position(0);
                 //od4.send(ppr);
-            }
-
-            if (nullptr != iplimage) {
-                cvReleaseImageHeader(&iplimage);
             }
         }
         retCode = 0;

@@ -26,9 +26,7 @@ RUN echo http://dl-4.alpinelinux.org/alpine/v3.8/main > /etc/apk/repositories &&
         git \
         opencv \
         opencv-dev \
-        make \
-        upx
-
+        make
 ADD . /opt/sources
 WORKDIR /opt/sources
 RUN mkdir build && \
