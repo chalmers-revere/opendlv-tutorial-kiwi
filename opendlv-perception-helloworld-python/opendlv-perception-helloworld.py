@@ -22,9 +22,9 @@ import sysv_ipc
 import numpy
 import cv2
 # OD4Session is needed to send and receive messages
-import OD4Session_for_Python3
+import OD4Session
 # Import the OpenDLV Standard Message Set.
-import opendlv_standard_message_set_v0_9_6_pb2
+import opendlv_standard_message_set_v0_9_10_pb2
 
 ################################################################################
 # This dictionary contains all distance values to be filled by function onDistance(...).
@@ -50,12 +50,12 @@ def onDistance(msg, senderStamp, timeStamps):
 # Replay mode: CID = 253
 # Live mode: CID = 112
 # TODO: Change to CID 112 when this program is used on Kiwi.
-session = OD4Session_for_Python3.OD4Session(cid=253)
+session = OD4Session.OD4Session(cid=253)
 # Register a handler for a message; the following example is listening
 # for messageID 1039 which represents opendlv.proxy.DistanceReading.
 # Cf. here: https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L113-L115
 messageIDDistanceReading = 1039
-session.registerMessageCallback(messageIDDistanceReading, onDistance, opendlv_standard_message_set_v0_9_6_pb2.opendlv_proxy_DistanceReading)
+session.registerMessageCallback(messageIDDistanceReading, onDistance, opendlv_standard_message_set_v0_9_10_pb2.opendlv_proxy_DistanceReading)
 # Connect to the network session.
 session.connect()
 
@@ -90,13 +90,16 @@ while True:
     # Unlock access to shared memory.
     mutex.release()
 
-    # Turn buf into img array (640 * 480 * 4 bytes (ARGB)) to be used with OpenCV.
-    img = numpy.frombuffer(buf, numpy.uint8).reshape(480, 640, 4)
+    # Turn buf into img array (1280 * 720 * 4 bytes (ARGB)) to be used with OpenCV.
+    img = numpy.frombuffer(buf, numpy.uint8).reshape(720, 1280, 4)
 
     ############################################################################
     # TODO: Add some image processing logic here.
+ 
+    # Invert colors
+    img = cv2.bitwise_not(img)
 
-    # The following example is adding a red rectangle and displaying the result.
+    # Add a red rectangle
     cv2.rectangle(img, (50, 50), (100, 100), (0,0,255), 2)
 
     # TODO: Disable the following two lines before running on Kiwi:
@@ -113,7 +116,7 @@ while True:
     ############################################################################
     # Example for creating and sending a message to other microservices; can
     # be removed when not needed.
-    angleReading = opendlv_standard_message_set_v0_9_6_pb2.opendlv_proxy_AngleReading()
+    angleReading = opendlv_standard_message_set_v0_9_10_pb2.opendlv_proxy_AngleReading()
     angleReading.angle = 123.45
 
     # 1038 is the message ID for opendlv.proxy.AngleReading
@@ -124,13 +127,13 @@ while True:
     #
     # Uncomment the following lines to steer; range: +38deg (left) .. -38deg (right).
     # Value groundSteeringRequest.groundSteering must be given in radians (DEG/180. * PI).
-    #groundSteeringRequest = opendlv_standard_message_set_v0_9_6_pb2.opendlv_proxy_GroundSteeringRequest()
+    #groundSteeringRequest = opendlv_standard_message_set_v0_9_10_pb2.opendlv_proxy_GroundSteeringRequest()
     #groundSteeringRequest.groundSteering = 0
     #session.send(1090, groundSteeringRequest.SerializeToString());
 
     # Uncomment the following lines to accelerate/decelerate; range: +0.25 (forward) .. -1.0 (backwards).
     # Be careful!
-    #pedalPositionRequest = opendlv_standard_message_set_v0_9_6_pb2.opendlv_proxy_PedalPositionRequest()
+    #pedalPositionRequest = opendlv_standard_message_set_v0_9_10_pb2.opendlv_proxy_PedalPositionRequest()
     #pedalPositionRequest.position = 0
     #session.send(1086, pedalPositionRequest.SerializeToString());
 
