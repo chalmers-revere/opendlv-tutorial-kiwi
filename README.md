@@ -100,7 +100,7 @@ Now, connect your laptop's webbrowser to the *Raspberry Pi's* IP address, port 8
 
 ### Getting Started 2.1: Local replay on your computer
 
-The third tutorial is to download a recording file and replay it on your local system. For this test, we assume that you have completed tutorial 1.1.
+This tutorial is to download a recording file and replay it on your local system. For this test, we assume that you have completed tutorial 1.1.
 
 _Prerequisites:_
 
@@ -123,7 +123,7 @@ You can stop the application by pressing `Ctrl-C` followed by the command `docke
 
 ### Getting Started 2.2: Extracting `.csv` files from a recording on your computer
 
-The fourth tutorial is to extract `.csv` files from a recording file for data post-processing. A `.csv` file is create for every message type that is exchanged on Kiwi including the sent, received, and sample timestamps.
+This tutorial is to extract `.csv` files from a recording file for data post-processing. A `.csv` file is create for every message type that is exchanged on Kiwi including the sent, received, and sample timestamps.
 
 _Prerequisites:_
 
