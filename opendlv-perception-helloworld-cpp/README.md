@@ -1,53 +1,51 @@
-## Processing image data with OpenCV and controlling Kiwi using C++
+# Processing image data with OpenCV and controlling Kiwi using C++
 
 This C++-template demonstrates how to develop a software module to process video data (eg., image detection, etc.) to be used with Kiwi.
 
 Prerequisites:
 * [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/debian/#install-docker-ce)
 * [You need to install `docker-compose`](https://docs.docker.com/compose/install/#install-compose)
-* You have successfully completed the "Getting Started" tutorials [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master).
+* You have successfully completed the _Getting started_ tutorials [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master).
 * You have a recording file (`.rec`) with some video frames.
 
 ---
 
-### Building and testing the software module for your laptop (replay mode)
+## Building and testing the software module for your laptop (replay mode)
 
 This template folder contains everything you need to compile and run a C++ software component that uses OpenCV for image processing. We are using Docker to build and run the resulting binary.
 
-* Step 1: Assuming that you have a folder `~/recordings`, where you have at least one `.rec` file from your experiments with Kiwi.
+* Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file from your experiments with Kiwi.
 
 * Step 2: Clone this repository:
 ```bash
 cd $HOME
 git clone https://github.com/chalmers-revere/opendlv-tutorial-kiwi.git
-cd opendlv-tutorial-kiwi/templates/image-postprocessing-opencv-cpp
+cd opendlv-tutorial-kiwi/templates/opendlv-perception-helloworld-cpp
 ```
 
-* Step 3: Now, you can start the h264 decoder and webapp for replaying as follows (the actual h264 decoder is built once during the first call):
-```bash
-docker-compose -f h264-decoder-viewer.yml up
-```
-
-* Step 4: Next, start a webbrowser and connect to your local webapp: http://localhost:8081 and open the folder view. Select one of the `.rec` files for replay and begin the replay to fill the shared memory with some image data; you can pause the replay shortly after you saw the image in your browser.
-
-* Step 5: Next, you enable access to your X11 server (GUI; necessary once per login):
+* Step 3: Next, you enable access to your X11 server (GUI; necessary once per login):
 ```bash
 xhost +
 ```
 
-* Step 6: Assuming that you are located in the `image-postprocessing-opencv-cpp` folder, you can build the software module as follows:
+* Step 4: Now, you can start the h264 replay and webapp for replaying as follows (the actual h264 replay is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the webb app to see data UDP multicast data.
 ```bash
-docker build -t myapp -f Dockerfile.amd64 .
+docker-compose -f h264-replay-viewer.yml up
 ```
 
-* Step 7: Now, you can run your software component:
+* Step 5: Assuming that you are located in the `opendlv-perception-helloworld-cpp` folder, you can build the software module as follows:
 ```bash
-docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=253 --name=img.argb --width=640 --height=480 --verbose
+docker build -t myapp .
+```
+
+* Step 6: Now, you can run your software component:
+```bash
+docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=253 --name=img.argb --width=1280 --height=720 --verbose
 ```
 
 The application should start and wait for images to come in. Now, continue to replay your recording; the C++ application should open a new window and display the frames. Furthermore, the code also display the distance readings from the sensors.
 
-You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 6 and step 7 after any change to your software.
+You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 5 and step 6 after any change to your software.
 
 After a while, you might have collected a lot of unused Docker images on your machine. You can remove them by running:
 ```bash
@@ -56,7 +54,13 @@ for i in $(docker images|tr -s " " ";"|grep "none"|cut -f3 -d";"); do docker rmi
 
 ---
 
-### Deploying and testing the Python application on Kiwi
+## Deploying and testing the C++ application in Kiwi simulation
+
+_Will be added soon_
+
+---
+
+## Deploying and testing the C++ application on Kiwi
 
 When you are ready to test the features and performance of your software component on Kiwi in live mode, you need to build the software component for `armhf`. Therefore, you will find a file named `Dockerfile.armhf` in this template folder that describes the necessary steps to build your software component for `armhf`.  
 
@@ -64,7 +68,7 @@ When you are ready to test the features and performance of your software compone
 
 * Step 2: **Make sure that you commented all debug windows from OpenCV as there won't be a GUI available on Kiwi.''
 
-* Step 3: Assuming that you are located in the `image-postprocessing-opencv-cpp` folder, you can build the software module for `armhf` as follows:
+* Step 3: Assuming that you are located in the `opendlv-perception-helloworld-cpp` folder, you can build the software module for `armhf` as follows:
 ```bash
 docker build -t myapp.armhf -f Dockerfile.armhf .
 ```

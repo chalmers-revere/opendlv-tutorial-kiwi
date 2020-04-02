@@ -2,15 +2,15 @@
 
 This "Getting Started" tutorial will introduce you to Kiwi, the miniature robotic vehicle platform from Chalmers Revere. Its hardware and software are entirely open source and you are invited to use, change, and contribute.
 
-## Table of Contents
-* [Hardware Overview](#hardware-overview)
-* [Booting the system](#booting-the-system)
-* [Connect to Kiwi](#connect-to-kiwi)
-* [Interacting with Kiwi using Microservices](#interacting-with-kiwi-using-microservices)
+*Table of Contents*
+* [Introducing Kiwi](#introducing-kiwi)
+* [Working with the Kiwi hardware](#working-with-the-kiwi-hardware)
+* [Working with data replay for Kiwi](#working-with-data-replay-for-kiwi)
+* [Working with Kiwi simulation](#working-with-kiwi-simulation)
+* [Next steps](#next-steps)
 
 ---
-
-### Hardware Overview
+## Introducing Kiwi
 
 The following components are installed on your Kiwi:
 
@@ -30,7 +30,6 @@ The following pictures provide an overview of the installed components on Kiwi.
 
 All the sensors except for the camera are connected to a small PCB board and then to the BeagleBone Blue board. The camera is directly connected to the Raspberry Pi board. The two boards are connected by a USB cable, which is treated by both boards as a standard network connection. Both boards are also wireless-ready: in particular, the Raspberry Pi has WiFi capabilities, while the BeagleBone Blue has both WiFi and Bluetooth connectivity.
 
----
 ### Booting the system
 There is a specific sequence to follow in order to boot up the Kiwi platform correctly. First, use the main power switch to turn on the BeagleBone Blue. You will see several blue led lights blinking. Wait until the green leds in the bottom-right corner of the board are turned on. At this point, you can turn on the ESC by pushing its power button: you will start hearing a repetitive beep sound that indicates that the beaglebone is waiting to connect to the raspberry pi. Wait until you see a red led on in the top right corner of the beaglebone. Finally push the following buttons in sequence: MOD, PAU, MOD. The beeping sound should stop indicating that the system has started correctly.
 
@@ -49,7 +48,13 @@ To ssh to the pi
 
 Kiwi's software is encapsulated into separate [microservices](https://en.wikipedia.org/wiki/Microservices) that interact using UDP multicast. An overview of available microservices in use at Chalmers Revere is provided [here](https://github.com/chalmers-revere/opendlv).
 
-#### Getting Started 1: Camera Live Stream to a Webbrowser, data recording, data replay, data export
+The tutorials below will show how to both use microservices on the Kiwi itself, and how to connect to microserices running on an external computer, as for example a laptop.
+
+---
+
+## Working with the Kiwi hardware
+
+### Getting Started 1.1: Camera Live Stream to a Webbrowser, data recording, data replay, data export
 
 The first tutorial is to run microservices that stream the camera feed to your webbrowser. For this tutorial, we need the following three microservices running on *Raspberry Pi*:
 
@@ -73,11 +78,9 @@ Now, connect your laptop's webbrowser to the *Raspberry Pi's* IP address, port 8
 
 To record the live data, simply click on the record button that should turn red. You can stop the recording by pressing that button again. To download a recording, click on the folder button next to the record button; a new page is presented that shows the available recording files that reside on Kiwi. You can select the file you would like to download by clicking on the button labeled with `.rec`. If you want to export the recorded messages a separate `.csv`, simply click on the button with the corresponding label. To delete a recording, click on the trash bin and to start a replay, simply click on the replay button.
 
----
+### Getting Started 1.2: Controlling Kiwi using your webbrowser
 
-#### Getting Started 2: Controlling Kiwi using your webbrowser
-
-The second tutorial is start an additional microservice to control Kiwi with your webbrowser. For this tutorial, we run all microservices from *Tutorial 1* and add the following microservice on *BeagleBone Blue*:
+The second tutorial is start an additional microservice to control Kiwi with your webbrowser. For this tutorial, we run all microservices from *Tutorial 1.1* and add the following microservice on *BeagleBone Blue*:
 
 * [opendlv-device-kiwi-prugw](https://github.com/chalmers-revere/opendlv-device-kiwi-prugw) - interfacing with Kiwi's motor and servo
 
@@ -93,37 +96,38 @@ Now, connect your laptop's webbrowser to the *Raspberry Pi's* IP address, port 8
 
 ---
 
-#### Getting Started 3: Local replay on your computer
+## Working with data replay for Kiwi
 
-The third tutorial is to download a recording file and replay it on your local system. For this test, we assume that you have completed tutorial 1.
+### Getting Started 2.1: Local replay on your computer
+
+The third tutorial is to download a recording file and replay it on your local system. For this test, we assume that you have completed tutorial 1.1.
 
 _Prerequisites:_
 
 * [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [You need to install `docker-compose`](https://docs.docker.com/compose/install/#install-compose)
-* It is recommended to use the Chrome web-browser 68+.
 
 _Tutorial:_
 
-* Download the `.rec` file of interest from Kiwi to your computer into the folder `$HOME/recordings`. If the folder does not exist, you can create it as follows: `mkdir -p $HOME/recordings` running in a terminal.
-* Next, download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.githubusercontent.com/chalmers-revere/opendlv-tutorial-kiwi/master/image-postprocessing-opencv-python/h264-decoder-viewer.yml -O h264-decoder-viewer.yml`.
-* Now, start the application description: `docker-compose -f h264-decoder-viewer.yml up` in a terminal.
+* Download the `.rec` file of interest from Kiwi to your computer into the folder `$HOME/kiwi-recordings`. If the folder does not exist, you can create it as follows: `mkdir -p $HOME/kiwi-recordings` running in a terminal.
+* Next, download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.githubusercontent.com/chalmers-revere/opendlv-tutorial-kiwi/master/opendlv-perception-helloworld-python/h264-replay-viewer.yml -O h264-replay-viewer.yml`.
+* Edit the YML file so that `yourFile.rec` one of your recording files. List your file names in the terminal by running `ls -l $HOME/kiwi-recordings` running in a terminal.
+* Next, in the terminal, run the command `xhost +` to allow Docker to access the desktop environment (i.e. opening new windows on the display). This needs to be done once everytime you restart your computer.
+* Now, start the application description: `docker-compose -f h264-replay-viewer.yml up` in a terminal.
 
-The application is available when you read a message stating `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
+A rendering of recorded video will be show on screen, and the web viewer will give the following message in your terminal: `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
 
-Now, you can open a recent web browser (like Chrome 68+ or Safari 11+ for example) and point it to http://localhost:8081. Open the folder view and select the recording file to replay. Click on the play button next to the file entry.
+Now, you can open a modern web browser and point it to http://localhost:8081. You should now be able to see the messages sent over UDP multicast in the messages tab. You can also use the interface to record messages, and any such new recordings will end up in the folder `$HOME/recordings`. Note however that the video will not be resaved in the new recording file, since it is transmitted via shared memory (and not on UDP multicast). Please create such recording file for the next step of the tutorial.
 
 You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-decoder-viewer.yml down` in a terminal.
 
----
-
-#### Getting Started 4: Extracting `.csv` files from a recording on your computer
+### Getting Started 2.2: Extracting `.csv` files from a recording on your computer
 
 The fourth tutorial is to extract `.csv` files from a recording file for data post-processing. A `.csv` file is create for every message type that is exchanged on Kiwi including the sent, received, and sample timestamps.
 
 _Prerequisites:_
 
-* Have tutorial 3 completed.
+* Have tutorial 2.1 completed.
 
 _Tutorial:_
 
@@ -131,36 +135,30 @@ _Tutorial:_
 
 The application is available when you read a message stating `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
 
-Now, you can open a recent web browser (like Chrome 68+ or Safari 11+ for example) and point it to http://localhost:8081. Open the folder view and click on the button labeled `.csv` to extract the messages in separate `.csv` files and get a download offered for a `.zip`-file containing all extracted `.csv` files. Depending on the size of the selected recording file, this step might take up to a few minutes.
+Now, you can open a modern web browser and point it to http://localhost:8081. Open the folder view and click on the button labeled `.csv` to extract the messages in separate `.csv` files and get a download offered for a `.zip`-file containing all extracted `.csv` files. Depending on the size of the selected recording file, this step might take up to a few minutes.
 
 You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-decoder-viewer.yml down` in a terminal.
 
 ---
 
-#### Getting Started 5: Extracting `.csv`/`.png` files from a recording on your computer
+## Working with Kiwi simulation
 
-The fifth tutorial is to extract `.csv` and `.png` files from a recording file for data post-processing. A `.csv` file is create for every message type that is exchanged on Kiwi including the sent, received, and sample timestamps and a `.png` file is created for each video frame and named according to the sample timestamp.
+### Getting Started 3.1: Starting the simulation environment
 
-_Prerequisites:_
+_Will be added soon_
 
-* Have tutorial 3 completed.
+### Getting started 3.2: Recording shared memory and UDP multicast from the recorder
 
-_Tutorial:_
-
-* If not already running, start the application description: `docker-compose -f h264-decoder-viewer.yml up` in a terminal.
-
-The application is available when you read a message stating `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
-
-Now, you can open Chrome (version 68+) and point it to http://localhost:8081. Open the folder view and click on the button labeled `.csv/.png` to extract the messages in separate `.csv` files and export the video frames as `.png` files. This step takes a while to complete as during the first time, a specific Docker image is built (takes around 5min) and afterwards, depending on the length of your `.rec`-file, the data is processed. Do not close the browser window and wait for your download. Thus, it is recommended to run this tutorial with a small recording file first.
-
-You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-decoder-viewer.yml down` in a terminal.
+_Will be added soon_
 
 ---
+
+## Next steps
 
 _Where to go from here?_
 
 Now, you are able to use the camera from your Kiwi, visualize, record, and replay the data, and to send steering, acceleration, and deceleration commands.
 
-Next, you can investigate our template module that is running in Python to process video data and to send steering, acceleration, and deceleration commands to Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/image-postprocessing-opencv-python) next to further descriptions how to develop and test your Python application.
+Next, you can investigate our template module that is running in Python to process video data and to send steering, acceleration, and deceleration commands to Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/opendlv-perception-helloworld-python) next to further descriptions how to develop and test your Python application.
 
-Alternatively, you can investigate our template module that is running in C++ to process video data and to interface with Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/image-postprocessing-opencv-cpp) next to further descriptions how to develop and test your C++ application.
+Alternatively, you can investigate our template module that is running in C++ to process video data and to interface with Kiwi. You find the template [here](https://github.com/chalmers-revere/opendlv-tutorial-kiwi/tree/master/opendlv-perception-helloworld-cpp) next to further descriptions how to develop and test your C++ application.
