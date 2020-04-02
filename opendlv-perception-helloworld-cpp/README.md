@@ -16,7 +16,7 @@ This template folder contains everything you need to compile and run a C++ softw
 
 * Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file from your experiments with Kiwi.
 
-* Step 2: Clone this repository:
+* Step 2: Clone this repository (if it was done already in the Python tutorial, then skip command #2):
 ```bash
 cd $HOME
 git clone https://github.com/chalmers-revere/opendlv-tutorial-kiwi.git
@@ -28,12 +28,12 @@ cd opendlv-tutorial-kiwi/templates/opendlv-perception-helloworld-cpp
 xhost +
 ```
 
-* Step 4: Now, you can start the h264 replay and webapp for replaying as follows (the actual h264 replay is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the webb app to see data UDP multicast data.
+* Step 4: Now, you can start the h264 replay and web app for replaying as follows (the actual h264 replay is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the web app to see data UDP multicast data.
 ```bash
 docker-compose -f h264-replay-viewer.yml up
 ```
 
-* Step 5: Assuming that you are located in the `opendlv-perception-helloworld-cpp` folder, you can build the software module as follows:
+* Step 5: Open another terminal. Then, assuming that you are located in the `opendlv-perception-helloworld-cpp` folder, you can build the software module as follows:
 ```bash
 docker build -t myapp .
 ```
@@ -43,7 +43,7 @@ docker build -t myapp .
 docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=253 --name=img.argb --width=1280 --height=720 --verbose
 ```
 
-The application should start and wait for images to come in. Now, continue to replay your recording; the C++ application should open a new window and display the frames. Furthermore, the code also display the distance readings from the sensors.
+The application should start and wait for images to come in. Furthermore, the code also display all other sensor values from the recording file, and the code example show how these messages can be parsed.
 
 You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 5 and step 6 after any change to your software.
 

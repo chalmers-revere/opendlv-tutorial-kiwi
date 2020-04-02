@@ -92,14 +92,18 @@ int32_t main(int32_t argc, char **argv) {
                     // Be aware of that any code between lock/unlock is blocking
                     // the camera to provide the next frame. Thus, any
                     // computationally heavy algorithms should be placed outside
-                    // lock/unlock.
+                    // lock/unlock
                     cv::Mat wrapped(HEIGHT, WIDTH, CV_8UC4, sharedMemory->data());
                     img = wrapped.clone();
                 }
                 sharedMemory->unlock();
 
                 // TODO: Do something with the frame.
-                // Example: Draw a red rectangle and display image.
+
+                // Invert colors
+                cv::bitwise_not(img, img);
+
+                // Draw a red rectangle
                 cv::rectangle(img, cv::Point(50, 50), cv::Point(100, 100), cv::Scalar(0,0,255));
 
                 // Display image.

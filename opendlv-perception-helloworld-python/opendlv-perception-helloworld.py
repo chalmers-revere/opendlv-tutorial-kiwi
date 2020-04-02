@@ -99,7 +99,7 @@ while True:
     # Invert colors
     img = cv2.bitwise_not(img)
 
-    # Add a red rectangle
+    # Draw a red rectangle
     cv2.rectangle(img, (50, 50), (100, 100), (0,0,255), 2)
 
     # TODO: Disable the following two lines before running on Kiwi:

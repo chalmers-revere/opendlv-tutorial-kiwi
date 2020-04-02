@@ -17,10 +17,10 @@ sudo apt-get install libcluon
 ```Bash
 sudo apt-get install --no-install-recommends \
     build-essential \
-    python-protobuf \
-    python-sysv-ipc \
-    python-numpy \
-    python-opencv \
+    python3-protobuf \
+    python3-sysv-ipc \
+    python3-numpy \
+    python3-opencv \
     protobuf-compiler
 ```
 
@@ -30,9 +30,9 @@ sudo apt-get install --no-install-recommends \
 
 This template folder contains an example how to use Python to process data residing in a shared memory area using OpenCV for image processing.
 
-* Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file from your experiments with Kiwi.
+* Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file with included video.
 
-* Step 2: Clone this repository:
+* Step 2: Clone this repository (if it was done already in the C++ tutorial, then skip command #2):
 ```bash
 cd $HOME
 git clone https://github.com/chalmers-revere/opendlv-tutorial-kiwi.git
@@ -45,19 +45,20 @@ make
 ```
 This step needs to be repeated whenever you change something in the message specifications.
 
-* Step 4: Now, you can start the h264 replay and webapp as follows (the actual h264 replay microservice is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the webb app to see data UDP multicast data.
+* Step 4: Now, you can start the h264 replay and web app as follows (the actual h264 replay microservice is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the web app to see data UDP multicast data. You should see a video running on your screen before continuing.
 
 ```bash
 docker-compose -f h264-replay-viewer.yml up
 ```
 
 
-* Step 4: Run the Pyton (note that you need version 3) module from the folder `opendlv-perception-helloworld-python`:
+* Step 4: Open another terminal. Then run the Python (note that you need version 3) module from the folder `opendlv-perception-helloworld-python`:
 ```bash
-python opendlv-perception-helloworld.py
+cd opendlv-tutorial-kiwi/opendlv-perception-helloworld-python
+python3 opendlv-perception-helloworld.py
 ```
 
-The application should start and wait for images to come in. Now, continue to replay your recording; the Python application should open a new window and display the frames. Furthermore, the code also display the distance readings from the sensors.
+The application should start and wait for images to come in. Furthermore, the code also display all other sensor values from the recording file, and the code example show how these messages can be parsed.
 
 You can stop the Python application by pressing `Ctrl-C`. When you are modifying the Python application, repeat step 4 after any change modification.
 
