@@ -106,10 +106,11 @@ _Prerequisites:_
 
 * [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 * [You need to install `docker-compose`](https://docs.docker.com/compose/install/#install-compose)
+* Recording files including video
 
 _Tutorial:_
 
-* Download the `.rec` file of interest from Kiwi to your computer into the folder `$HOME/kiwi-recordings`. If the folder does not exist, you can create it as follows: `mkdir -p $HOME/kiwi-recordings` running in a terminal.
+* Download the `.rec` file of interest from Kiwi to your computer into the folder `$HOME/kiwi-recordings`.
 * Next, download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.githubusercontent.com/chalmers-revere/opendlv-tutorial-kiwi/master/opendlv-perception-helloworld-python/h264-replay-viewer.yml -O h264-replay-viewer.yml`.
 * Edit the YML file so that `yourFile.rec` one of your recording files. List your file names in the terminal by running `ls -l $HOME/kiwi-recordings` running in a terminal.
 * Next, in the terminal, run the command `xhost +` to allow Docker to access the desktop environment (i.e. opening new windows on the display). This needs to be done once everytime you restart your computer.
