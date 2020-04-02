@@ -30,11 +30,7 @@ sudo apt-get install --no-install-recommends \
 
 This template folder contains an example how to use Python to process data residing in a shared memory area using OpenCV for image processing.
 
-* Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file from your experiments with Kiwi. Now, you can start the h264 replay and webapp as follows (the actual h264 replay microservice is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the webb app to see data UDP multicast data.
-
-```bash
-docker-compose -f h264-replay-viewer.yml up
-```
+* Step 1: Assuming that you have a folder `~/kiwi-recordings`, where you have at least one `.rec` file from your experiments with Kiwi.
 
 * Step 2: Clone this repository:
 ```bash
@@ -48,6 +44,12 @@ cd opendlv-tutorial-kiwi/opendlv-perception-helloworld-python
 make
 ```
 This step needs to be repeated whenever you change something in the message specifications.
+
+* Step 4: Now, you can start the h264 replay and webapp as follows (the actual h264 replay microservice is built once during the first call). Remember to change the filename to a file that exists in `~/kiwi-recordings`. The replay will start automatically when the program starts, including a video stream put in shared memory, and you can use the webb app to see data UDP multicast data.
+
+```bash
+docker-compose -f h264-replay-viewer.yml up
+```
 
 
 * Step 4: Run the Pyton (note that you need version 3) module from the folder `opendlv-perception-helloworld-python`:

@@ -114,13 +114,15 @@ _Tutorial:_
 * Next, download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.githubusercontent.com/chalmers-revere/opendlv-tutorial-kiwi/master/opendlv-perception-helloworld-python/h264-replay-viewer.yml -O h264-replay-viewer.yml`.
 * Edit the YML file so that `yourFile.rec` one of your recording files. List your file names in the terminal by running `ls -l $HOME/kiwi-recordings` running in a terminal.
 * Next, in the terminal, run the command `xhost +` to allow Docker to access the desktop environment (i.e. opening new windows on the display). This needs to be done once everytime you restart your computer.
-* Now, start the application description: `docker-compose -f h264-replay-viewer.yml up` in a terminal.
+* Now, start the application description: `docker-compose -f h264-replay-viewer.yml up` in a terminal. The first time this is done, the h264-replay program will be compiled (due to licencing reasons).
 
 A rendering of recorded video will be show on screen, and the web viewer will give the following message in your terminal: `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
 
 Now, you can open a modern web browser and point it to http://localhost:8081. You should now be able to see the messages sent over UDP multicast in the messages tab. You can also use the interface to record messages, and any such new recordings will end up in the folder `$HOME/recordings`. Note however that the video will not be resaved in the new recording file, since it is transmitted via shared memory (and not on UDP multicast). Please create such recording file for the next step of the tutorial.
 
-You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-decoder-viewer.yml down` in a terminal.
+You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-replay-viewer.yml down` in a terminal.
+
+Note that the web app requires quite much from the computer to run. Here we used it to see the UDP messages, and to make a record file, but the messages will be available in the running session also without the web app. To start only the replay microservice, run `docker-compose -f h264-replay-viewer.yml up video-h264-replay-amd64`.
 
 ### Getting Started 2.2: Extracting `.csv` files from a recording on your computer
 
@@ -132,13 +134,17 @@ _Prerequisites:_
 
 _Tutorial:_
 
-* If not already running, start the application description: `docker-compose -f h264-decoder-viewer.yml up` in a terminal.
+* Start the application description: `docker-compose -f h264-replay-viewer.yml up vehicle-view` in a terminal. You do not need to start the replay microservice this time.
 
 The application is available when you read a message stating `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 112, using OD4Session 253 for playback.`
 
-Now, you can open a modern web browser and point it to http://localhost:8081. Open the folder view and click on the button labeled `.csv` to extract the messages in separate `.csv` files and get a download offered for a `.zip`-file containing all extracted `.csv` files. Depending on the size of the selected recording file, this step might take up to a few minutes.
+Now, you can open a modern web browser and point it to http://localhost:8081. First, go to the folder view where you should see the recording you made earlier. Clicking on the name of the file, and then the messages tab (for that file), one can see that there are some unknown messages in the file. These messages needs a newer version of the OpenDLV standard message set to be displayed properly, so we need to add it to the web app.
 
-You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-decoder-viewer.yml down` in a terminal.
+Download the latest file [here](https://raw.githubusercontent.com/chalmers-revere/opendlv.standard-message-set/v0.9.10/opendlv.odvd). Save it to your Downloads folder or similar, then, by using the Linux file browser, drag the file into the top dashed area inside the vehicle view web page. This will enable all messages inside the recording file. 
+
+Then, go back to the folder view and click on the button labeled `.csv`. This will extract all messages in separate `.csv` files, and offer a download for a `.zip`-file containing all files. Depending on the size of the selected recording file, this step might take up to a few minutes.
+
+You can stop the application by pressing `Ctrl-C` followed by the command `docker-compose -f h264-replay-viewer.yml down` in a terminal.
 
 ---
 
