@@ -97,7 +97,7 @@ scp -P 2200 myapp.tar pi@192.168.8.1:~
 ssh -p 2200 pi@192.168.8.1
 ```
 
-* Step 8: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your webbrowser) is still running, you can load your application into Docker and start it:
+* Step 8: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your web browser) is still running, you can load your application into Docker and start it:
 ```Bash
 docker load < myapp.tar
 docker run --rm -ti --init --ipc=host --net=host -v /tmp:/tmp myapp:latest 
@@ -127,7 +127,7 @@ scp -P 2200 opendlv-perception-helloworld.py pi@192.168.8.1:~
 ssh -p 2200 pi@192.168.8.1
 ```
 
-* Step 6: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your webbrowser) is still running, you can load your application into Docker and start it:
+* Step 6: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your web browser) is still running, you can load your application into Docker and start it:
 ```Bash
 docker run --rm -ti --init --ipc=host --net=host -v /tmp:/tmp -v $HOME/opendlv-perception-helloworld.py:/opt/sources/opendlv-perception-helloworld.py myapp:latest
 ```

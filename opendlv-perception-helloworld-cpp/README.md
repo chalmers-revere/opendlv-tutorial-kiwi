@@ -89,7 +89,7 @@ ssh -p 2200 pi@192.168.8.1
 cat myapp.armhf.tar | docker load
 ```
 
-* Step 7: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your webbrowser) is still running, you can finally run your software component next to other microservices on Kiwi's *Raspberry Pi*:
+* Step 7: Assuming that the Getting Started Tutorial 2 (Controlling Kiwi using your web browser) is still running, you can finally run your software component next to other microservices on Kiwi's *Raspberry Pi*:
 ```bash
 docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp myapp.armhf --cid=112 --name=img.argb --width=640 --height=480
 ```

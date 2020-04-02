@@ -56,7 +56,7 @@ The tutorials below will show how to both use microservices on the Kiwi itself, 
 
 ### Getting Started 1.1: Camera Live Stream to a Webbrowser, data recording, data replay, data export
 
-The first tutorial is to run microservices that stream the camera feed to your webbrowser. For this tutorial, we need the following three microservices running on *Raspberry Pi*:
+The first tutorial is to run microservices that stream the camera feed to your web browser. For this tutorial, we need the following three microservices running on *Raspberry Pi*:
 
 1. [opendlv-device-camera-rpi](https://github.com/chalmers-revere/opendlv-device-camera-rpi) - accessing Raspberry Pi's camera
 2. [opendlv-video-x264-encoder](https://github.com/chalmers-revere/opendlv-video-x264-encoder) - converting a camera frame into an h264 frame
@@ -74,13 +74,13 @@ To simplify the distribution of microservices and the description how to configu
 
 _Getting Started:_
 
-Now, connect your laptop's webbrowser to the *Raspberry Pi's* IP address, port 8081: http://192.168.8.1:8081. As a result, you should see a live stream from your Kiwi's camera and the installed sensors visualized in your webbrowser.
+Now, connect your laptop's web browser to the *Raspberry Pi's* IP address, port 8081: http://192.168.8.1:8081. As a result, you should see a live stream from your Kiwi's camera and the installed sensors visualized in your web browser.
 
 To record the live data, simply click on the record button that should turn red. You can stop the recording by pressing that button again. To download a recording, click on the folder button next to the record button; a new page is presented that shows the available recording files that reside on Kiwi. You can select the file you would like to download by clicking on the button labeled with `.rec`. If you want to export the recorded messages a separate `.csv`, simply click on the button with the corresponding label. To delete a recording, click on the trash bin and to start a replay, simply click on the replay button.
 
-### Getting Started 1.2: Controlling Kiwi using your webbrowser
+### Getting Started 1.2: Controlling Kiwi using your web browser
 
-The second tutorial is start an additional microservice to control Kiwi with your webbrowser. For this tutorial, we run all microservices from *Tutorial 1.1* and add the following microservice on *BeagleBone Blue*:
+The second tutorial is start an additional microservice to control Kiwi with your web browser. For this tutorial, we run all microservices from *Tutorial 1.1* and add the following microservice on *BeagleBone Blue*:
 
 * [opendlv-device-kiwi-prugw](https://github.com/chalmers-revere/opendlv-device-kiwi-prugw) - interfacing with Kiwi's motor and servo
 
@@ -92,7 +92,7 @@ To simplify the distribution of this microservice and the description how to con
 
 _Getting Started:_
 
-Now, connect your laptop's webbrowser to the *Raspberry Pi's* IP address, port 8081: [http://192.168.8.1:8081](http://192.168.8.1:8081). You should still see a live stream from your Kiwi's camera visualized in your webbrowser. Next, enable the `Joystick` by pushing the joystick button in order to send [opendlv.proxy.PedalPositionRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L208-L210) and [opendlv.proxy.GroundSteeringRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L216-L218) to interface with Kiwi's motor and servo. Now, you can click and drag with your mouse (or pan on a smartphone/tablet) to accelerate/decelerate and steer Kiwi.
+Now, connect your laptop's web browser to the *Raspberry Pi's* IP address, port 8081: [http://192.168.8.1:8081](http://192.168.8.1:8081). You should still see a live stream from your Kiwi's camera visualized in your web browser. Next, enable the `Joystick` by pushing the joystick button in order to send [opendlv.proxy.PedalPositionRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L208-L210) and [opendlv.proxy.GroundSteeringRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L216-L218) to interface with Kiwi's motor and servo. Now, you can click and drag with your mouse (or pan on a smartphone/tablet) to accelerate/decelerate and steer Kiwi.
 
 ---
 
