@@ -40,7 +40,7 @@ docker build -t myapp .
 
 * Step 6: Now, you can run your software component:
 ```bash
-docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=253 --name=img.argb --width=1280 --height=720 --verbose
+docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=111 --name=img.argb --width=1280 --height=720 --verbose
 ```
 
 The application should start and wait for images to come in. Furthermore, the code also display all other sensor values from the recording file, and the code example show how these messages can be parsed.

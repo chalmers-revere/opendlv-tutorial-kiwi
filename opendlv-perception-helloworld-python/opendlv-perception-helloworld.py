@@ -50,7 +50,7 @@ def onDistance(msg, senderStamp, timeStamps):
 # Replay mode: CID = 253
 # Live mode: CID = 112
 # TODO: Change to CID 112 when this program is used on Kiwi.
-session = OD4Session.OD4Session(cid=253)
+session = OD4Session.OD4Session(cid=111)
 # Register a handler for a message; the following example is listening
 # for messageID 1039 which represents opendlv.proxy.DistanceReading.
 # Cf. here: https://github.com/chalmers-revere/opendlv.standard-message-set/blob/master/opendlv.odvd#L113-L115
