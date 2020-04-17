@@ -20,7 +20,7 @@ This template folder contains everything you need to compile and run a C++ softw
 ```bash
 cd $HOME
 git clone https://github.com/chalmers-revere/opendlv-tutorial-kiwi.git
-cd opendlv-tutorial-kiwi/templates/opendlv-perception-helloworld-cpp
+cd opendlv-tutorial-kiwi/opendlv-perception-helloworld-cpp
 ```
 
 * Step 3: Next, you enable access to your X11 server (GUI; necessary once per login):
