@@ -70,14 +70,16 @@ You can stop the Python application by pressing `Ctrl-C`. When you are modifying
 
 * Step 2: Start the simulation as described in section 3.1.
 
-* Step 3: Open another terminal. Then run the Python (note that you need version 3) module from the folder `opendlv-perception-helloworld-python`:
+* Step 3: Inside `opendlv-perception-helloworld.py` change the name of the shared memory from `/tmp/img.argb` to `/tmp/video0.argb`
+
+* Step 4: Open another terminal. Then run the Python (note that you need version 3) module from the folder `opendlv-perception-helloworld-python`:
 ```bash
 python3 opendlv-perception-helloworld.py
 ```
 
 The application should start and wait for images to come in. Furthermore, the code also display all other sensor values from the recording file, and the code example show how these messages can be parsed. You can also send actuation signals, as exemplified in the code, to steer the simulated robot.
 
-You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 3 after any change to your software.
+You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 4 after any change to your software.
 
 ---
 
