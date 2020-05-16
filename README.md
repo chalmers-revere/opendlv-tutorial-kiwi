@@ -189,12 +189,12 @@ _Tutorial:_
 
 * Open a second terminal.
 * Download the application description, as a complement to the one downloaded in 3.1, to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi-two.yml`
-* Make sure that both files use the same `--timemod` value
+* Make sure that both files use the same `--timemod` value on _all_ simulation services
 * Now, in the first terminal, start the same application as in 3.1 by running `docker-compose -f simulation-kiwi.yml up` and, in the second terminal, run `docker-compose -f simulation-kiwi-two.yml up`
 
 This will run a second simulated Kiwi car isolated in its own OpenDLV context (a libcluon conference). The only data shared between the two contexts are  [opendlv.sim.Frame](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L19-L26), which is used for integrating the two simulations.
 
-Open two browser tabs and point them to http://localhost:8081 and http://localhost:8082 (one for each simulated Kiwi car). Next, enable the `Joystick` by pushing the joystick button in order to steer the simulated Kiwi. Turn around in order to see the second Kiwi car and then stop. Now, switch to the second browser tab and steer the second Kiwi to see it move in the simulated camera stream.
+Open two browser tabs and point them to http://localhost:8081 and http://localhost:8082 (one for each simulated Kiwi car). Next, enable the `Joystick` by pushing the joystick button in order to steer the simulated Kiwi. Turn around in order to see the second Kiwi car and then stop. Now, switch to the second browser tab and enable the `Joystick` to then steer the second Kiwi to see it move in the simulated camera stream.
 
 ---
 

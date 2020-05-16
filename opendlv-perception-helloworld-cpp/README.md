@@ -56,7 +56,28 @@ for i in $(docker images|tr -s " " ";"|grep "none"|cut -f3 -d";"); do docker rmi
 
 ## Deploying and testing the C++ application in Kiwi simulation
 
-_Will be added soon_
+* Step 1: Have the previous tutorial completed.
+
+* Step 2: Start the simulation as described in section 3.1.
+
+* Step 3: Open another terminal. Then, assuming that you are located in the `opendlv-perception-helloworld-cpp` folder, you can build the software module as follows:
+```bash
+docker build -t myapp .
+```
+
+* Step 4: Now, you can run your software component:
+```bash
+docker run --rm -ti --init --net=host --ipc=host -v /tmp:/tmp -e DISPLAY=$DISPLAY myapp --cid=111 --name=video0.argb --width=1280 --height=720 --verbose
+```
+
+The application should start and wait for images to come in. Furthermore, the code also display all other sensor values from the recording file, and the code example show how these messages can be parsed. You can also send actuation signals, as exemplified in the code, to steer the simulated robot.
+
+You can stop your software component by pressing `Ctrl-C`. When you are modifying the software component, repeat step 3 and step 4 after any change to your software.
+
+After a while, you might have collected a lot of unused Docker images on your machine. You can remove them by running:
+```bash
+for i in $(docker images|tr -s " " ";"|grep "none"|cut -f3 -d";"); do docker rmi -f $i; done
+```
 
 ---
 
