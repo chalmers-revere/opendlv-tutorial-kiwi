@@ -162,8 +162,8 @@ _Prerequisites:_
 
 _Tutorial:_
 
-* Download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi.yml`.
-* Download the cone track scenario to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/conetrack.zip`.
+* Download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi.yml`
+* Download the cone track scenario to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/conetrack.zip`
 * Uncompress the zip file by running the command `unzip conetrack.zip`.
 * Next, in the terminal, run the command `xhost +` to allow Docker to access the desktop environment (i.e. opening new windows on the display). This needs to be done once everytime you restart your computer.
 * Now, start the application description: `docker-compose -f simulation-kiwi.yml up` in a terminal.
@@ -172,7 +172,7 @@ You can stop the simulation at any time by pressing `Ctrl-C` followed by the com
 
 Note that the default version is for Intel GPUs and VirtualBox. If you want to run the simulation using an Nvidia GPU, change `chalmersrevere/opendlv-sim-camera-mesa:v0.0.1` into `chalmersrevere/opendlv-sim-camera-nvidia:v0.0.1` in the .yml file. 
 
-Note also that if using a VirtualBox for this tutorial, the graphics rendering will be done using a software renderer resulting in slow rendering. If given the message `[cluon::OD4Session]: time-triggered delegate violated allocated time slice.`, then the simulation cannot keep up. To solve this, modify the .yml file and change the `--timemod` arguments for the three simulated components from `1.0` to `0.2`.
+Note also that if using a VirtualBox for this tutorial, the graphics rendering will be done using a software renderer resulting in slow rendering. If given the message `[cluon::OD4Session]: time-triggered delegate violated allocated time slice.`, then the simulation cannot keep up. To solve this, modify the .yml file and change the `--timemod` arguments for the three simulated components from `1.0` to `0.2`. *NOTE:* It needs to be changed for all *three* simulation services.
 
 A rendering of the simulated camera from the virtual Kiwi car will be show on screen, and the web viewer will give the following message in your terminal: `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 111, using OD4Session 253 for playback.`
 

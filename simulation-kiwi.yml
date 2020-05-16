@@ -23,16 +23,13 @@ services:
       - DISPLAY=${DISPLAY}
     command: "--cid=111 --frame-id=0 --map-path=/opt/map --x=0.0 --z=0.095 --width=1280 --height=720 --fovy=48.8 --freq=7 --timemod=1.0 --verbose"
 
-  kiwi-view:
-    container_name: kiwi-view
-    image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.60
-    restart: always
+  opendlv-kiwi-view:
+    image: chrberger/opendlv-kiwi-view-webrtc-multi:v0.0.6
     network_mode: "host"
     volumes:
-      - /home/pi/recordings:/opt/vehicle-view/recordings
+      - ~/recordings:/opt/vehicle-view/recordings
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - PORT=8081
       - OD4SESSION_CID=111
-      - OPENDLV_VEHICLE_VIEW_PLATFORM=Kiwi 
-    ports:
-      - "8081:8081"
+      - PLAYBACK_OD4SESSION_CID=253
