@@ -172,11 +172,13 @@ You can stop the simulation at any time by pressing `Ctrl-C` followed by the com
 
 Note that the default version is for Intel GPUs and VirtualBox. If you want to run the simulation using an Nvidia GPU, change `chalmersrevere/opendlv-sim-camera-mesa:v0.0.1` into `chalmersrevere/opendlv-sim-camera-nvidia:v0.0.1` in the .yml file. 
 
-Note also that if using a VirtualBox for this tutorial, the graphics rendering will be done using a software renderer resulting in slow rendering. If given the message `[cluon::OD4Session]: time-triggered delegate violated allocated time slice.`, then the simulation cannot keep up. To solve this, modify the .yml file and change the `--timemod` arguments for the three simulated components from `1.0` to `0.2`. *NOTE:* It needs to be changed for all *three* simulation services.
+Note also that if using a VirtualBox for this tutorial, the graphics rendering will be done using a software renderer resulting in slow rendering. If given the message `[cluon::OD4Session]: time-triggered delegate violated allocated time slice.`, then the simulation cannot keep up. To solve this, modify the .yml file and change the `--timemod` arguments for the three simulated components from `1.0` to `0.2`. **NOTE:** It needs to be changed for all *three* simulation services.
 
 A rendering of the simulated camera from the virtual Kiwi car will be show on screen, and the web viewer will give the following message in your terminal: `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 111, using OD4Session 253 for playback.`
 
 Now, you can open a modern web browser and point it to http://localhost:8081. You should now be able to see the messages sent over UDP multicast in the messages tab. You can also use the interface to record messages, and any such new recordings will end up in the folder `$HOME/recordings`. Note however that the video will not be resaved in the new recording file, since it is transmitted via shared memory (and not on UDP multicast). Next, enable the `Joystick` by pushing the joystick button in order to send [opendlv.proxy.PedalPositionRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L208-L210) and [opendlv.proxy.GroundSteeringRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L216-L218) to interface with Kiwi's motor and servo. Now, you can click and drag with your mouse (or pan on a smartphone/tablet) to accelerate/decelerate and steer the simulated Kiwi.
+
+Note that the simulated video seems to be rather low framerate, and if using the `--timemod` option this is even more visible. This is intended, as the Raspberry Pi camera has an update frequency of 7.5 FPS (which might be lowered with the time modifier).
 
 ### Getting started 3.2: Driving two simulated Kiwi cars in the same simulation
 
@@ -185,8 +187,10 @@ For this test, we assume that you have completed tutorial 3.1.
 
 _Tutorial:_
 
-* Download the application description, as a complement to the one downloaded in 3.1, to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi-two.yml`.
-* Now, start the application description: `docker-compose -f simulation-kiwi-two.yml up` in a terminal.
+* Open a second terminal.
+* Download the application description, as a complement to the one downloaded in 3.1, to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi-two.yml`
+* Make sure that both files use the same `--timemod` value
+* Now, in the first terminal, start the same application as in 3.1 by running `docker-compose -f simulation-kiwi.yml up` and, in the second terminal, run `docker-compose -f simulation-kiwi-two.yml up`
 
 This will run a second simulated Kiwi car isolated in its own OpenDLV context (a libcluon conference). The only data shared between the two contexts are  [opendlv.sim.Frame](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L19-L26), which is used for integrating the two simulations.
 

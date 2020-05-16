@@ -4,12 +4,12 @@ services:
   sim-global-two:
     image: chalmersrevere/opendlv-sim-global-amd64:v0.0.7
     network_mode: "host"
-    command: "/usr/bin/opendlv-sim-global --cid=112 --freq=50 --timemod=0.2 --frame-id=0 --x=1.9 --y=1.6 --yaw=-3.14 --extra-cid-out=111:1"
+    command: "/usr/bin/opendlv-sim-global --cid=112 --freq=50 --timemod=1.0 --frame-id=0 --x=1.9 --y=1.6 --yaw=-3.14 --extra-cid-out=111:1"
 
   sim-motor-kiwi-two:
     image: chalmersrevere/opendlv-sim-motor-kiwi-amd64:v0.0.7
     network_mode: "host"
-    command: "/usr/bin/opendlv-sim-motor-kiwi --cid=112 --freq=200 --timemod=0.2 --frame-id=0"
+    command: "/usr/bin/opendlv-sim-motor-kiwi --cid=112 --freq=200 --timemod=1.0 --frame-id=0"
 
   opendlv-kiwi-view-two:
     image: chrberger/opendlv-kiwi-view-webrtc-multi:v0.0.6
