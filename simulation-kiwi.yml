@@ -21,7 +21,7 @@ services:
       - /tmp:/tmp
     environment:
       - DISPLAY=${DISPLAY}
-    command: "--cid=111 --frame-id=0 --map-path=/opt/map --x=0.0 --z=0.095 --width=1280 --height=720 --fovy=48.8 --freq=7 --timemod=1.0 --verbose"
+    command: "--cid=111 --frame-id=0 --map-path=/opt/map --x=0.0 --z=0.095 --width=1280 --height=720 --fovy=48.8 --freq=7.5 --timemod=1.0 --verbose"
 
   opendlv-kiwi-view:
     image: chrberger/opendlv-kiwi-view-webrtc-multi:v0.0.6
