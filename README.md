@@ -152,11 +152,45 @@ You can stop the application by pressing `Ctrl-C` followed by the command `docke
 
 ### Getting Started 3.1: Starting the simulation environment
 
-_Will be added soon_
+This tutorial is on starting a Kiwi car simulation, with a simulated camera, and
+then to steer ut using the vehicle view. For this test, we assume that you have completed tutorial 1.2.
 
-### Getting started 3.2: Recording shared memory and UDP multicast from the recorder
+_Prerequisites:_
 
-_Will be added soon_
+* [You need to install Docker for your platform](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [You need to install `docker-compose`](https://docs.docker.com/compose/install/#install-compose)
+
+_Tutorial:_
+
+* Download the application description (a .yml-file for docker-compose) to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi.yml`.
+* Download the cone track scenario to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/conetrack.zip`.
+* Uncompress the zip file by running the command `unzip conetrack.zip`.
+* Next, in the terminal, run the command `xhost +` to allow Docker to access the desktop environment (i.e. opening new windows on the display). This needs to be done once everytime you restart your computer.
+* Now, start the application description: `docker-compose -f simulation-kiwi.yml up` in a terminal.
+
+You can stop the simulation at any time by pressing `Ctrl-C` followed by the command `docker-compose -f simulation-kiwi.yml down` in a terminal.
+
+Note that the default version is for Intel GPUs and VirtualBox. If you want to run the simulation using an Nvidia GPU, change `chalmersrevere/opendlv-sim-camera-mesa:v0.0.1` into `chalmersrevere/opendlv-sim-camera-nvidia:v0.0.1` in the .yml file. 
+
+Note also that if using a VirtualBox for this tutorial, the graphics rendering will be done using a software renderer resulting in slow rendering. If given the message `[cluon::OD4Session]: time-triggered delegate violated allocated time slice.`, then the simulation cannot keep up. To solve this, modify the .yml file and change the `--timemod` arguments for the three simulated components from `1.0` to `0.2`.
+
+A rendering of the simulated camera from the virtual Kiwi car will be show on screen, and the web viewer will give the following message in your terminal: `[opendlv-vehicle-view] Web server listening on port: 8081, joining live OD4Session 111, using OD4Session 253 for playback.`
+
+Now, you can open a modern web browser and point it to http://localhost:8081. You should now be able to see the messages sent over UDP multicast in the messages tab. You can also use the interface to record messages, and any such new recordings will end up in the folder `$HOME/recordings`. Note however that the video will not be resaved in the new recording file, since it is transmitted via shared memory (and not on UDP multicast). Next, enable the `Joystick` by pushing the joystick button in order to send [opendlv.proxy.PedalPositionRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L208-L210) and [opendlv.proxy.GroundSteeringRequest](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L216-L218) to interface with Kiwi's motor and servo. Now, you can click and drag with your mouse (or pan on a smartphone/tablet) to accelerate/decelerate and steer the simulated Kiwi.
+
+### Getting started 3.2: Driving two simulated Kiwi cars in the same simulation
+
+This tutorial is on starting a second Kiwi car in the same simulation as demonstrated in 3.1.
+For this test, we assume that you have completed tutorial 3.1.
+
+_Tutorial:_
+
+* Download the application description, as a complement to the one downloaded in 3.1, to `$HOME` in a terminal: `wget https://raw.github.com/chalmers-revere/opendlv-tutorial-kiwi/master/simulation-kiwi-two.yml`.
+* Now, start the application description: `docker-compose -f simulation-kiwi-two.yml up` in a terminal.
+
+This will run a second simulated Kiwi car isolated in its own OpenDLV context (a libcluon conference). The only data shared between the two contexts are  [opendlv.sim.Frame](https://github.com/chalmers-revere/opendlv.standard-message-set/blob/fb11778810a37d76d45e83e52ea054dac2e2a350/opendlv.odvd#L19-L26), which is used for integrating the two simulations.
+
+Open two browser tabs and point them to http://localhost:8081 and http://localhost:8082 (one for each simulated Kiwi car). Next, enable the `Joystick` by pushing the joystick button in order to steer the simulated Kiwi. Turn around in order to see the second Kiwi car and then stop. Now, switch to the second browser tab and steer the second Kiwi to see it move in the simulated camera stream.
 
 ---
 

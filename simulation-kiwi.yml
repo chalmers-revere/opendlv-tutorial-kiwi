@@ -1,0 +1,38 @@
+version: "3.6"
+
+services:
+  sim-global:
+    image: chalmersrevere/opendlv-sim-global-amd64:v0.0.7
+    network_mode: "host"
+    command: "/usr/bin/opendlv-sim-global --cid=111 --freq=20 --frame-id=0 --x=0.0 --yaw=0.2 --timemod=1.0"
+
+  sim-motor-kiwi:
+    image: chalmersrevere/opendlv-sim-motor-kiwi-amd64:v0.0.7
+    network_mode: "host"
+    command: "/usr/bin/opendlv-sim-motor-kiwi --cid=111 --freq=50 --frame-id=0 --timemod=1.0"
+
+  sim-camera:
+    container_name: sim-camera
+    image: chalmersrevere/opendlv-sim-camera-mesa:v0.0.1
+    ipc: "host"
+    network_mode: "host"
+    volumes:
+      - ${PWD}/conetrack:/opt/map
+      - /tmp:/tmp
+    environment:
+      - DISPLAY=${DISPLAY}
+    command: "--cid=111 --frame-id=0 --map-path=/opt/map --x=0.0 --z=0.095 --width=1280 --height=720 --fovy=48.8 --freq=7 --timemod=1.0 --verbose"
+
+  kiwi-view:
+    container_name: kiwi-view
+    image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.60
+    restart: always
+    network_mode: "host"
+    volumes:
+      - /home/pi/recordings:/opt/vehicle-view/recordings
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - OD4SESSION_CID=111
+      - OPENDLV_VEHICLE_VIEW_PLATFORM=Kiwi 
+    ports:
+      - "8081:8081"
