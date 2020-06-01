@@ -54,18 +54,26 @@ include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Creaet link from the versioned cluon file to a filename with no version
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-complete.hpp
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  COMMAND ${CMAKE_COMMAND} -E create_symlink 
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE}
-  ${CMAKE_BINARY_DIR}/cluon-complete.hpp
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE})
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-msc
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E create_symlink 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE} 
+    ${CMAKE_BINARY_DIR}/cluon-complete.hpp
+    COMMAND ${CMAKE_COMMAND} -E create_symlink 
+    ${CMAKE_BINARY_DIR}/cluon-complete.hpp 
+    ${CMAKE_BINARY_DIR}/cluon-complete.cpp
+    COMMAND ${CMAKE_CXX_COMPILER} -o ${CMAKE_BINARY_DIR}/cluon-msc 
+    ${CMAKE_BINARY_DIR}/cluon-complete.cpp -std=c++14 -pthread -D HAVE_CLUON_MSC
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE})
 
 # Generate opendlv-standard-message-set.hpp using the cluon-msc
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMAND cluon-msc --cpp --out=${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET})
+    COMMAND ${CMAKE_BINARY_DIR}/cluon-msc --cpp 
+    --out=${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET} 
+    ${CMAKE_BINARY_DIR}/cluon-msc)
 
 # Find and include thread support, needed for libcluon
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -82,15 +90,14 @@ if(UNIX)
 endif()
 
 # Find and include OpenCV
-find_package(OpenCV REQUIRED core highgui imgproc)
+find_package(OpenCV REQUIRED)
 include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} ${OpenCV_LIBS})
 
 # Tell the compiler what executable we want, and what libraries to link
 add_executable(${PROJECT_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.cpp
-  ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp
-  ${CMAKE_BINARY_DIR}/cluon-complete.hpp)
+  ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp)
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 # Tell how the app is installed after compilation (the executable is copied to 'bin'

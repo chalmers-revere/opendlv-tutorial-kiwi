@@ -13,19 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM ubuntu:18.04 as builder
-ENV DEBIAN_FRONTEND=noninteractive 
+FROM archlinux as builder
 
-RUN apt-get update
-RUN apt-get install -y \
-    build-essential \
-    cmake \
-    software-properties-common \
-    libopencv-dev
-
-RUN add-apt-repository -y ppa:chrberger/libcluon
-RUN apt-get update
-RUN apt-get install -y libcluon
+RUN pacman -Syu --noconfirm
+RUN pacman -S --noconfirm opencv qt5-base hdf5 vtk glew
+RUN pacman -S --noconfirm base-devel cmake
 
 ADD . /opt/sources
 WORKDIR /opt/sources
@@ -35,21 +27,10 @@ RUN mkdir build && \
     make && make install
 
 
-FROM ubuntu:18.04
-ENV DEBIAN_FRONTEND=noninteractive 
+FROM archlinux
 
-RUN apt-get update
-RUN apt-get install -y \
-    libopencv-core3.2 \
-    libopencv-imgproc3.2 \
-    libopencv-video3.2 \
-    libopencv-calib3d3.2 \
-    libopencv-features2d3.2 \
-    libopencv-objdetect3.2 \
-    libopencv-highgui3.2 \
-    libopencv-videoio3.2 \
-    libopencv-flann3.2 \
-    python3-opencv
+RUN pacman -Syu --noconfirm
+RUN pacman -S --noconfirm opencv qt5-base hdf5 vtk glew
 
 WORKDIR /usr/bin
 COPY --from=builder /tmp/dest /usr
