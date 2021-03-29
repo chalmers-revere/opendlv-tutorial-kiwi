@@ -50,6 +50,4 @@ services:
         - /var/run/docker.sock:/var/run/docker.sock
         environment:
         - OD4SESSION_CID=112
-        ports:
-        - "8081:8081"
 
