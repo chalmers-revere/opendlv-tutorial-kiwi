@@ -232,11 +232,13 @@ int32_t main(int32_t argc, char **argv) {
                 cv::Mat drawingYellow;
                 drawingYellow = drawContours(cannyYellow, contoursYellow, cv::Scalar(0,255,255));
 
-                if (contoursYellow.size() > 0){
-                    std::cout << "Yellow contours!" << std::endl;
-                    for ( size_t i = 0; i < contoursYellow.size(); i++) 
-                    {                        
-                        std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
+                if (VERBOSE) {
+                    if (contoursYellow.size() > 0){
+                        std::cout << "Yellow contours!" << std::endl;
+                        for ( size_t i = 0; i < contoursYellow.size(); i++) 
+                        {                        
+                            std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
+                        }
                     }
                 }
                 
@@ -248,12 +250,13 @@ int32_t main(int32_t argc, char **argv) {
                 cv::Mat drawingBlue;
                 drawingBlue = drawContours(cannyBlue, contoursBlue, cv::Scalar(255,0,0));
 
-
-                if (contoursBlue.size() > 0){
-                    std::cout << "Blue contours!" << std::endl;
-                    for ( size_t i = 0; i < contoursBlue.size(); i++) 
-                    {
-                        std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
+                if (VERBOSE) {
+                    if (contoursBlue.size() > 0){
+                        std::cout << "Blue contours!" << std::endl;
+                        for ( size_t i = 0; i < contoursBlue.size(); i++) 
+                        {
+                            std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
+                        }
                     }
                 }
 
