@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  control:
+    image: kiwi-control
+    build:
+      context: ./kiwi-control/.
+      dockerfile: Dockerfile.amd64
+    network_mode: "host"
+    ipc: "host"
+    volumes:
+      - /tmp:/tmp
+    command: "--cid=111 --freq=10"
+  perception:
+    image: kiwi-perception
+    build:
+      context: ./opendlv-perception-helloworld-cpp/.
+      dockerfile: Dockerfile
+    network_mode: "host"
+    ipc: "host"
+    volumes:
+      - /tmp:/tmp
+    environment:
+      - DISPLAY=${DISPLAY}
+    command: "--cid=111 --name=img.argb --width=1280 --height=640 --verbose"
