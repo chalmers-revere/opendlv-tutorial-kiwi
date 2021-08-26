@@ -52,15 +52,14 @@ cv::Mat drawContours(cv::Mat img, std::vector<std::vector<cv::Point>> contours, 
         cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
     }
 
-    cv::Mat drawing = cv::Mat::zeros(img.size(), CV_8UC3 );
     for( size_t i = 0; i< contours.size(); i++ )
     {
-        cv::drawContours( drawing, contours_poly, (int)i, color );
-        cv::rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2 );
-        cv::circle( drawing, centers[i], (int)radius[i], color, 2 );
+        cv::drawContours( img, contours_poly, (int)i, color );
+        cv::rectangle( img, boundRect[i].tl(), boundRect[i].br(), color, 2 );
+        cv::circle( img, centers[i], (int)radius[i], color, 2 );
     }
 
-    return drawing;
+    return img;
 }
 
 cv::Point2f ij2xy (cv::Point2f pt) {
@@ -253,20 +252,18 @@ int32_t main(int32_t argc, char **argv) {
                 std::vector<std::vector<cv::Point>> contoursYellow;
                 cv::findContours(cannyYellow, contoursYellow, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-                cv::Mat drawingYellow;
-                drawingYellow = drawContours(cannyYellow, contoursYellow, cv::Scalar(0,255,255));
+                
+                drawContours(crop_img, contoursYellow, cv::Scalar(0,255,255));
                 
 
                 //---- contours of Blue Cones
                 std::vector<std::vector<cv::Point>> contoursBlue;
                 cv::findContours(cannyBlue, contoursBlue, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-                cv::Mat drawingBlue;
-                drawingBlue = drawContours(cannyBlue, contoursBlue, cv::Scalar(255,0,0));
+                // cv::Mat drawingBlue;
+                drawContours(crop_img, contoursBlue, cv::Scalar(255,0,0));
 
-
-                // --- Compute middle point
-                
+                // -------- Compute middle point------------              
                 // compute mean of blue cones
                 cv::Point2f meanBlue;
                 if (contoursBlue.size() > 0) {
@@ -291,6 +288,7 @@ int32_t main(int32_t argc, char **argv) {
                 // Draw line from bottom center to midpoint
                 cv::line(crop_img, cv::Point2d(300, 210), midpoint, cv::Scalar(0, 0, 255), 5);
                            
+                // -------- Compute middle point end------------ 
 
                 // Display image.
                 if (VERBOSE) {
@@ -323,8 +321,8 @@ int32_t main(int32_t argc, char **argv) {
                     // cv::imshow("Masked", masked_img);
                     // cv::imshow("CannyYellow", cannyYellow);
                     // cv::imshow("CannyBlue", cannyBlue);
-                    cv::imshow("ContoursYellow", drawingYellow);
-                    cv::imshow("ContoursBlue", drawingBlue);
+                    // cv::imshow("ContoursYellow", drawingYellow);
+                    // cv::imshow("ContoursBlue", drawingBlue);
                     // cv::imshow("Mean Point", drawingMean);
                     // cv::imshow("Merged", crop_img + drawingYellow + drawing Blue)
                     // cv::imshow("Blobs", im_with_keypoints);
