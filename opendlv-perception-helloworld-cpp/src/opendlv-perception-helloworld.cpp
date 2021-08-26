@@ -27,16 +27,17 @@
 #include <memory>
 #include <mutex>
 #include <math.h> 
+#include <chrono>
+
 
 // using namespace cv;
 
 
-cv::Mat dilate_erode(cv::Mat img) {
+cv::Mat dilate_erode(cv::Mat img, uint32_t ndilate, uint32_t nerode) {
     cv::Mat dilate;
-    uint32_t iterations{5};
-    cv::dilate(img, dilate, cv::Mat(), cv::Point(-1,-1), iterations, 1,1);
+    cv::dilate(img, dilate, cv::Mat(), cv::Point(-1,-1), ndilate, 1,1);
     cv::Mat erode;
-    cv::erode(dilate, erode, cv::Mat(), cv::Point(-1,-1), iterations, 1, 1);
+    cv::erode(dilate, erode, cv::Mat(), cv::Point(-1,-1), nerode, 1, 1);
 
     return erode;
 }
@@ -91,7 +92,7 @@ std::vector<cv::Point2f> getAllContourCoordinates(std::vector<std::vector<cv::Po
 
     for( size_t i = 0; i < contours.size(); i++)
     {
-        cv::approxPolyDP(contours[i], contours_poly[i], 3, true);       
+        cv::approxPolyDP(contours[i], contours_poly[i], 3, true);
         cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
     }
 
@@ -104,7 +105,7 @@ cv::Point2f getMeanCoordinatesOfContours(std::vector<std::vector<cv::Point>> con
     */
     std::vector<cv::Point2f> points;
     points = getAllContourCoordinates(contours);
-    cv::Mat mean_;  
+    cv::Mat mean_;
     cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
     return cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
 }
@@ -114,13 +115,34 @@ cv::Point2f getMidpoint(cv::Point2f pt1, cv::Point2f pt2) {
     Return coordinate of a midpoint between pt1 and pt2
     */
     std::vector<cv::Point2f> points{pt1, pt2};
-    cv::Mat mean_;  
+    cv::Mat mean_;
     cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
     cv::Point2f midpoint(mean_.at<float>(0,0), mean_.at<float>(0,1));
     return midpoint;
 }
 
-                
+std::vector<std::string> tokenize(std::string s) {
+  std::vector<std::string> tokens;
+  size_t pos = 0;
+  std::string delimiter = ",";
+  std::string token;
+  while ((pos = s.find(delimiter)) != std::string::npos) {
+    token = s.substr(0, pos);
+    tokens.push_back(token);
+    s.erase(0, pos + delimiter.length());
+  }
+  tokens.push_back(s);
+  return tokens;
+}
+
+cv::Scalar toScalar(std::vector<std::string> data) {
+  std::vector<int> int_data;
+  for (auto const& i : data) {
+    int_data.push_back(std::stoi(i));
+  }
+  cv::Scalar scal(int_data[0], int_data[1], int_data[2]);
+  return scal;
+}
 
 
 int32_t main(int32_t argc, char **argv) {
@@ -147,6 +169,20 @@ int32_t main(int32_t argc, char **argv) {
         const uint32_t CROP_WIDTH = 600;
         const uint32_t CROP_HEIGHT = 210;
         const uint32_t X_DISTANCE = 150;
+
+        cv::Scalar hsvLowYellow = toScalar(tokenize(commandlineArguments["ylow"]));
+        cv::Scalar hsvHiYellow = toScalar(tokenize(commandlineArguments["yhigh"]));
+        cv::Scalar hsvLowBlue = toScalar(tokenize(commandlineArguments["blow"]));
+        cv::Scalar hsvHiBlue = toScalar(tokenize(commandlineArguments["bhigh"]));
+        const uint32_t NERODE{static_cast<uint32_t>(std::stoi(commandlineArguments["nerode"]))};
+        const uint32_t NDILATE{static_cast<uint32_t>(std::stoi(commandlineArguments["ndilate"]))};
+
+        // For monitoring execution time
+        using std::chrono::high_resolution_clock;
+        using std::chrono::duration_cast;
+        using std::chrono::duration;
+        using std::chrono::milliseconds;
+
 
         // Attach to the shared memory.
         std::unique_ptr<cluon::SharedMemory> sharedMemory{new cluon::SharedMemory{NAME}};
@@ -199,6 +235,7 @@ int32_t main(int32_t argc, char **argv) {
                 }
                 sharedMemory->unlock();
 
+                auto t1 = high_resolution_clock::now();
                 // TODO: Do something with the frame.
 
                 // Crop Image //TODO: make adaptive, use CROP_WIDTH and CROP_HEIGHT
@@ -211,29 +248,25 @@ int32_t main(int32_t argc, char **argv) {
 
                 // Drawing an ellipse over vehicle parts visible in camera feed
                 cv::ellipse(crop_img, cv::Point(300, CROP_HEIGHT), cv::Size(280, 55), 0, 0, 360, cv::Scalar(0, 255, 0),-1, cv::LINE_AA);
-                
+
 
                 // Convert to HSV
                 cv::Mat hsv;
                 cv::cvtColor(crop_img, hsv, cv::COLOR_BGR2HSV);
 
                 // Detect blue coloured pixels
-                cv::Scalar hsvLowBlue(110, 50, 50);
-                cv::Scalar hsvHiBlue(130, 255, 255);
                 cv::Mat blueCones;
                 cv::inRange(hsv, hsvLowBlue, hsvHiBlue, blueCones);
 
                 // Dilate and erode to fill detected cones
-                cv::Mat blueConesMask = dilate_erode(blueCones);
+                cv::Mat blueConesMask = dilate_erode(blueCones, NERODE, NDILATE);
 
                 // Detect yellow coloured pixels
-                cv::Scalar hsvLowYellow(15, 50, 50);
-                cv::Scalar hsvHiYellow(40, 255, 255);
                 cv::Mat yellowCones;
                 cv::inRange(hsv, hsvLowYellow, hsvHiYellow, yellowCones);
 
                 // Dilate and erode to fill detected cones
-                cv::Mat yellowConesMask = dilate_erode(yellowCones);
+                cv::Mat yellowConesMask = dilate_erode(yellowCones, NERODE, NDILATE);
 
                 // Use Masks from cones as pre-filter for edge detection
                 cv::Mat combinedMask;
@@ -259,7 +292,7 @@ int32_t main(int32_t argc, char **argv) {
 
                 // draw contours onto image
                 drawContours(crop_img, contoursYellow, cv::Scalar(0,255,255));
-                
+
 
                 //---- contours of Blue Cones
                 std::vector<std::vector<cv::Point>> contoursBlue;
@@ -268,7 +301,7 @@ int32_t main(int32_t argc, char **argv) {
                 // draw contours onto image
                 drawContours(crop_img, contoursBlue, cv::Scalar(255,0,0));
 
-                // -------- Compute middle point------------              
+                // -------- Compute middle point------------
                 // compute mean of blue cones
                 cv::Point2f meanBlue;
                 if (contoursBlue.size() > 0) {
@@ -291,6 +324,7 @@ int32_t main(int32_t argc, char **argv) {
 
 
                 // Draw line from bottom center to midpoint
+
                 cv::line(crop_img, cv::Point2d(300, CROP_HEIGHT), midpoint, cv::Scalar(255, 255, 0), 3);
 
 
@@ -309,18 +343,20 @@ int32_t main(int32_t argc, char **argv) {
                 float angle = atan(ij2xy(midpoint).x/X_DISTANCE);
                 std::string str(std::to_string(angle));
                 cv::putText(crop_img,str,cv::Point(CROP_WIDTH/2,CROP_HEIGHT-X_DISTANCE),cv::FONT_HERSHEY_DUPLEX,1,cv::Scalar(0,0,255),2,false);
-                
+               
+                cv::line(crop_img, cv::Point2d(300, 210), midpoint, cv::Scalar(0, 0, 255), 5);
 
-                
-                // -------- Compute middle point end------------ 
 
+                // -------- Compute middle point end------------
+
+                auto t2 = high_resolution_clock::now();
                 // Display image.
                 if (VERBOSE) {
                     // Print coordinates of yellow contours
                     if (contoursYellow.size() > 0){
                         std::cout << "Yellow contours!" << std::endl;
-                        for ( size_t i = 0; i < contoursYellow.size(); i++) 
-                        {                        
+                        for ( size_t i = 0; i < contoursYellow.size(); i++)
+                        {
                             std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
                         }
                     }
@@ -328,15 +364,15 @@ int32_t main(int32_t argc, char **argv) {
                     // Print coordinates of yellow contours
                     if (contoursBlue.size() > 0){
                         std::cout << "Blue contours!" << std::endl;
-                        for ( size_t i = 0; i < contoursBlue.size(); i++) 
+                        for ( size_t i = 0; i < contoursBlue.size(); i++)
                         {
                             std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
                         }
                     }
 
                     // Print coordinates of mean points
-                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
-                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
+                    std::cout<< "mean Yellow: " << meanYellow << std::endl;
+                    std::cout<< "mean Blue: " << meanBlue << std::endl;
                     std::cout<< "midpoint: " << midpoint << " xy:" <<  ij2xy(midpoint) << std::endl;
                     std::cout << "angle: " << angle << std::endl;
 
@@ -345,6 +381,9 @@ int32_t main(int32_t argc, char **argv) {
 
                     cv::waitKey(1);
                 }
+
+                auto ms_int = duration_cast<milliseconds>(t2 - t1);
+                std::cout << "Execution time = " << ms_int.count() << "ms" << std::endl;
 
                 ////////////////////////////////////////////////////////////////
                 // Do something with the distance readings if wanted.
