@@ -252,7 +252,7 @@ int32_t main(int32_t argc, char **argv) {
                 std::vector<std::vector<cv::Point>> contoursYellow;
                 cv::findContours(cannyYellow, contoursYellow, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-                
+                // draw contours onto image
                 drawContours(crop_img, contoursYellow, cv::Scalar(0,255,255));
                 
 
@@ -260,7 +260,7 @@ int32_t main(int32_t argc, char **argv) {
                 std::vector<std::vector<cv::Point>> contoursBlue;
                 cv::findContours(cannyBlue, contoursBlue, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-                // cv::Mat drawingBlue;
+                // draw contours onto image
                 drawContours(crop_img, contoursBlue, cv::Scalar(255,0,0));
 
                 // -------- Compute middle point------------              
@@ -315,17 +315,9 @@ int32_t main(int32_t argc, char **argv) {
                     std::cout<< "mean Blue: " << meanBlue << std::endl; 
                     std::cout<< "midpoint: " << midpoint << " xy:" <<  ij2xy(midpoint) << std::endl;
 
-                    // cv::imshow(sharedMemory->name().c_str(), img);
-                    // cv::imshow("Hough", hough);
+                    // Display image
                     cv::imshow("Cropped", crop_img);
-                    // cv::imshow("Masked", masked_img);
-                    // cv::imshow("CannyYellow", cannyYellow);
-                    // cv::imshow("CannyBlue", cannyBlue);
-                    // cv::imshow("ContoursYellow", drawingYellow);
-                    // cv::imshow("ContoursBlue", drawingBlue);
-                    // cv::imshow("Mean Point", drawingMean);
-                    // cv::imshow("Merged", crop_img + drawingYellow + drawing Blue)
-                    // cv::imshow("Blobs", im_with_keypoints);
+
                     cv::waitKey(1);
                 }
 
