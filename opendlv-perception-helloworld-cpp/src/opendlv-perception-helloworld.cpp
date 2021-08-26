@@ -20,11 +20,93 @@
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <cstdint>
 #include <iostream>
 #include <memory>
 #include <mutex>
+
+// using namespace cv;
+
+
+cv::Mat dilate_erode(cv::Mat img) {
+    cv::Mat dilate;
+    uint32_t iterations{5};
+    cv::dilate(img, dilate, cv::Mat(), cv::Point(-1,-1), iterations, 1,1);
+    cv::Mat erode;
+    cv::erode(dilate, erode, cv::Mat(), cv::Point(-1,-1), iterations, 1, 1);
+
+    return erode;
+}
+
+cv::Mat drawContours(cv::Mat img, std::vector<std::vector<cv::Point>> contours, cv::Scalar color) {
+    std::vector<std::vector<cv::Point>> contours_poly(contours.size());
+    std::vector<cv::Rect> boundRect(contours.size());
+    std::vector<cv::Point2f>centers(contours.size());
+    std::vector<float>radius(contours.size());
+    for( size_t i = 0; i < contours.size(); i++)
+    {
+        cv::approxPolyDP(contours[i], contours_poly[i], 3, true);
+        boundRect[i] = cv::boundingRect(contours_poly[i]);
+        cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
+    }
+
+    cv::Mat drawing = cv::Mat::zeros(img.size(), CV_8UC3 );
+    for( size_t i = 0; i< contours.size(); i++ )
+    {
+        cv::drawContours( drawing, contours_poly, (int)i, color );
+        cv::rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2 );
+        cv::circle( drawing, centers[i], (int)radius[i], color, 2 );
+    }
+
+    return drawing;
+}
+
+cv::Point2f ij2xy (cv::Point2f pt) {
+    // TODO: make adaptive
+    cv::Point2f origin(300.0 ,210.0);
+    cv::Point2f xyPt(pt.x - origin.x, origin.y - pt.y);
+
+
+    return xyPt;
+}
+
+// cv::Point2f xy2ij (cv::Point2f pt) {
+//     // TODO: make adaptive
+//     cv::Point2f origin(300.0 ,210.0);
+//     cv::Point2f ijPt(origin.x - pt.x, origin.y);
+
+//     return ijPt;
+// }
+
+
+cv::Point2f getContourCoordinates(std::vector<cv::Point> contour) {
+    std::vector<cv::Point> contour_poly;
+    cv::Point2f center;
+    float radius;
+
+    cv::approxPolyDP(contour, contour_poly, 3, true);
+    cv::minEnclosingCircle(contour_poly, center, radius);
+
+    // return ij2xy(center);
+    return center;
+}
+
+std::vector<cv::Point2f> getAllContourCoordinates(std::vector<std::vector<cv::Point>> contours) {
+    std::vector<std::vector<cv::Point>> contours_poly(contours.size());
+    std::vector<cv::Point2f>  centers(contours.size());
+    std::vector<float>radius(contours.size());
+
+    for( size_t i = 0; i < contours.size(); i++)
+    {
+        cv::approxPolyDP(contours[i], contours_poly[i], 3, true);       
+        cv::minEnclosingCircle(contours_poly[i], centers[i], radius[i]);
+    }
+
+    return centers;
+}
+
 
 int32_t main(int32_t argc, char **argv) {
     int32_t retCode{1};
@@ -100,27 +182,167 @@ int32_t main(int32_t argc, char **argv) {
 
                 // TODO: Do something with the frame.
 
-                // Invert colors
-                cv::bitwise_not(img, img);
+                // Crop Image
+                cv::Rect myROI(10, 10, 100, 100);
+                cv::Mat croppedImage = img(myROI);
+	            cv::Mat crop_img = img(cv::Range(300,720), cv::Range(40, 1240));
 
-                // Draw a red rectangle
-                cv::rectangle(img, cv::Point(50, 50), cv::Point(100, 100), cv::Scalar(0,0,255));
+                // Scale image
+                cv::resize(crop_img, crop_img, cv::Size(600,210), cv::INTER_LINEAR);
+
+                // Drawing an ellipse over vehicle parts visible in camera feed
+                cv::ellipse(crop_img, cv::Point(300, 210), cv::Size(280, 55), 0, 0, 360, cv::Scalar(0, 255, 0),-1, cv::LINE_AA);
+                
+
+                // Convert to HSV
+                cv::Mat hsv;
+                cv::cvtColor(crop_img, hsv, cv::COLOR_BGR2HSV);
+
+                // Detect blue coloured pixels
+                cv::Scalar hsvLowBlue(110, 50, 50);
+                cv::Scalar hsvHiBlue(130, 255, 255);
+                cv::Mat blueCones;
+                cv::inRange(hsv, hsvLowBlue, hsvHiBlue, blueCones);
+
+                // Dilate and erode to fill detected cones
+                cv::Mat blueConesMask = dilate_erode(blueCones);
+
+                // Detect yellow coloured pixels
+                cv::Scalar hsvLowYellow(15, 50, 50);
+                cv::Scalar hsvHiYellow(40, 255, 255);
+                cv::Mat yellowCones;
+                cv::inRange(hsv, hsvLowYellow, hsvHiYellow, yellowCones);
+
+                // Dilate and erode to fill detected cones
+                cv::Mat yellowConesMask = dilate_erode(yellowCones);
+
+                // Use Masks from cones as pre-filter for edge detection
+                cv::Mat combinedMask;
+                combinedMask = yellowConesMask + blueConesMask;
+
+                cv::Mat masked_img;
+                crop_img.copyTo(masked_img, combinedMask);
+
+                // Canny edge detection
+                // cv::Mat canny;
+                // cv::Canny(masked_img, canny, 30, 90, 3);
+
+
+                // Canny edge detection specific for yellow cones
+                cv::Mat cannyYellow;
+                cv::Canny(yellowConesMask, cannyYellow, 30, 90, 3);
+
+
+                // Canny edge detection specific for blue cones
+                cv::Mat cannyBlue;
+                cv::Canny(blueConesMask, cannyBlue, 30, 90, 3);
+
+
+                // ---- contours of Yellow Cones
+                std::vector<std::vector<cv::Point>> contoursYellow;
+                cv::findContours(cannyYellow, contoursYellow, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+                cv::Mat drawingYellow;
+                drawingYellow = drawContours(cannyYellow, contoursYellow, cv::Scalar(0,255,255));
+
+                if (contoursYellow.size() > 0){
+                    std::cout << "Yellow contours!" << std::endl;
+                    for ( size_t i = 0; i < contoursYellow.size(); i++) 
+                    {                        
+                        std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
+                    }
+                }
+                
+
+                //---- contours of Blue Cones
+                std::vector<std::vector<cv::Point>> contoursBlue;
+                cv::findContours(cannyBlue, contoursBlue, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+                cv::Mat drawingBlue;
+                drawingBlue = drawContours(cannyBlue, contoursBlue, cv::Scalar(255,0,0));
+
+
+                if (contoursBlue.size() > 0){
+                    std::cout << "Blue contours!" << std::endl;
+                    for ( size_t i = 0; i < contoursBlue.size(); i++) 
+                    {
+                        std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
+                    }
+                }
+
+
+                // --- Compute middle point
+                
+                // compute mean of blue cones
+                cv::Point2f meanBlue;
+                if (contoursBlue.size() > 0) {
+                    std::vector<cv::Point2f> points;
+
+                    points = getAllContourCoordinates(contoursBlue);
+
+                    cv::Mat mean_;  
+                    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
+                    meanBlue = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
+                } else {
+                    meanBlue = cv::Point2f(300, 150);
+                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
+                }
+
+
+                // // compute mean of yellow conescv::Point2f meanYellow;
+                cv::Point2f meanYellow;
+                if (contoursYellow.size() > 0) {
+                    std::vector<cv::Point2f> points;
+
+                    points = getAllContourCoordinates(contoursYellow);
+
+                    cv::Mat mean_;  
+                    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
+                    meanYellow = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
+                } else {
+                    meanYellow = cv::Point2f(-300, 150);
+                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
+                }
+
+                // // Compute mean of means
+                std::vector<cv::Point2f> points{meanBlue, meanYellow};
+                cv::Mat mean_;  
+                cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
+                cv::Point2f mean(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                std::cout<< "mean: " << mean << " xy:" <<  ij2xy(mean) << std::endl;
+
+      
+                cv::line(crop_img, cv::Point2d(300, 210), mean, cv::Scalar(0, 0, 255), 5);
+                
+                
 
                 // Display image.
                 if (VERBOSE) {
-                    cv::imshow(sharedMemory->name().c_str(), img);
+                    // cv::imshow(sharedMemory->name().c_str(), img);
+                    // cv::imshow("Hough", hough);
+                    cv::imshow("Cropped", crop_img);
+                    // cv::imshow("Masked", masked_img);
+                    // cv::imshow("CannyYellow", cannyYellow);
+                    // cv::imshow("CannyBlue", cannyBlue);
+                    cv::imshow("ContoursYellow", drawingYellow);
+                    cv::imshow("ContoursBlue", drawingBlue);
+                    // cv::imshow("Mean Point", drawingMean);
+                    // cv::imshow("Merged", crop_img + drawingYellow + drawing Blue)
+                    // cv::imshow("Blobs", im_with_keypoints);
                     cv::waitKey(1);
                 }
 
                 ////////////////////////////////////////////////////////////////
                 // Do something with the distance readings if wanted.
-                {
-                    std::lock_guard<std::mutex> lck(distancesMutex);
-                    std::cout << "front = " << front << ", "
-                              << "rear = " << rear << ", "
-                              << "left = " << left << ", "
-                              << "right = " << right << "." << std::endl;
-                }
+                // {
+                //     std::lock_guard<std::mutex> lck(distancesMutex);
+                //     std::cout << "front = " << front << ", "
+                //               << "rear = " << rear << ", "
+                //               << "left = " << left << ", "
+                //               << "right = " << right << "." << std::endl;
+                // }
 
                 ////////////////////////////////////////////////////////////////
                 // Example for creating and sending a message to other microservices; can
@@ -132,7 +354,7 @@ int32_t main(int32_t argc, char **argv) {
                 ////////////////////////////////////////////////////////////////
                 // Steering and acceleration/decelration.
                 //
-                // Uncomment the following lines to steer; range: +38deg (left) .. -38deg (right).
+                // Uncomment the following linMes to steer; range: +38deg (left) .. -38deg (right).
                 // Value groundSteeringRequest.groundSteering must be given in radians (DEG/180. * PI).
                 //opendlv::proxy::GroundSteeringRequest gsr;
                 //gsr.groundSteering(0);
@@ -149,4 +371,3 @@ int32_t main(int32_t argc, char **argv) {
     }
     return retCode;
 }
-
