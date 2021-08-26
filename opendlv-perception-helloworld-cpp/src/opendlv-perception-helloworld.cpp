@@ -399,7 +399,7 @@ int32_t main(int32_t argc, char **argv) {
                 // Example for creating and sending a message to other microservices; can
                 // be removed when not needed.
                 opendlv::proxy::AngleReading ar;
-                ar.angle(123.45f);
+                ar.angle(angle);
                 od4.send(ar);
 
                 ////////////////////////////////////////////////////////////////
