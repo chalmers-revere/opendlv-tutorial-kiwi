@@ -223,10 +223,6 @@ int32_t main(int32_t argc, char **argv) {
                 cv::Mat masked_img;
                 crop_img.copyTo(masked_img, combinedMask);
 
-                // Canny edge detection
-                // cv::Mat canny;
-                // cv::Canny(masked_img, canny, 30, 90, 3);
-
 
                 // Canny edge detection specific for yellow cones
                 cv::Mat cannyYellow;
