@@ -24,12 +24,14 @@ Behavior::Behavior() noexcept:
   m_rightIrReading{},
   m_groundSteeringAngleRequest{},
   m_pedalPositionRequest{},
+  m_angleReading{},
   m_frontUltrasonicReadingMutex{},
   m_rearUltrasonicReadingMutex{},
   m_leftIrReadingMutex{},
   m_rightIrReadingMutex{},
   m_groundSteeringAngleRequestMutex{},
-  m_pedalPositionRequestMutex{}
+  m_pedalPositionRequestMutex{},
+  m_angleReadingMutex{}
 {
 }
 
@@ -69,6 +71,12 @@ void Behavior::setRightIr(opendlv::proxy::VoltageReading const &rightIrReading) 
   m_rightIrReading = rightIrReading;
 }
 
+void Behavior::setAngleReading(opendlv::proxy::AngleReading const &angleReading) noexcept
+{
+  std::lock_guard<std::mutex> lock(m_angleReadingMutex);
+  m_angleReading = angleReading;
+}
+
 
 void Behavior::step() noexcept
 {
@@ -76,41 +84,74 @@ void Behavior::step() noexcept
   opendlv::proxy::DistanceReading rearUltrasonicReading;
   opendlv::proxy::VoltageReading leftIrReading;
   opendlv::proxy::VoltageReading rightIrReading;
+  opendlv::proxy::AngleReading angleReading;
   {
     std::lock_guard<std::mutex> lock1(m_frontUltrasonicReadingMutex);
     std::lock_guard<std::mutex> lock2(m_rearUltrasonicReadingMutex);
     std::lock_guard<std::mutex> lock3(m_leftIrReadingMutex);
     std::lock_guard<std::mutex> lock4(m_rightIrReadingMutex);
+    std::lock_guard<std::mutex> lock5(m_angleReadingMutex);
 
     frontUltrasonicReading = m_frontUltrasonicReading;
     rearUltrasonicReading = m_rearUltrasonicReading;
     leftIrReading = m_leftIrReading;
     rightIrReading = m_rightIrReading;
+    angleReading = m_angleReading;
   }
 
-  float frontDistance = frontUltrasonicReading.distance();
-  float rearDistance = rearUltrasonicReading.distance();
-  double leftDistance = convertIrVoltageToDistance(leftIrReading.voltage());
-  double rightDistance = convertIrVoltageToDistance(rightIrReading.voltage());
+  // float frontDistance = frontUltrasonicReading.distance();
+  // float rearDistance = rearUltrasonicReading.distance();
+  // double leftDistance = convertIrVoltageToDistance(leftIrReading.voltage());
+  // double rightDistance = convertIrVoltageToDistance(rightIrReading.voltage());
+  float angle = angleReading.angle();
+  // std::cout << "got angle reading: " << angle << std::endl; 
 
   float pedalPosition = 0.2f;
   float groundSteeringAngle = 0.3f;
-  if (frontDistance < 0.3f) {
-    pedalPosition = 0.0f;
+
+  // if (frontDistance < 0.3f) {
+  //   pedalPosition = frontDistance;
+  // } else {
+  //   if (rearDistance < 0.3f) {
+  //     pedalPosition = frontDistance;
+  //   }
+  // }
+
+  // if (leftDistance < rightDistance) {
+  //   if (leftDistance < 0.2f) {
+  //     groundSteeringAngle = 0.2f;
+  //     groundSteeringAngle = angle;
+  //   }
+  // } else {
+  //   if (rightDistance < 0.2f) {
+  //     groundSteeringAngle = 0.2f;
+  //     groundSteeringAngle = angle;
+  //   }
+  // }
+
+  //---- own control implementation ----
+  //TODO: Use as command line arguments
+  float maxSteerLeft = -0.5f;
+  float maxSteerRight = 0.5f;
+
+  //TODO: Try to implement a deadzone for small angles
+  if (angle < maxSteerLeft) {
+    groundSteeringAngle = maxSteerLeft;
+  } else if (angle > maxSteerRight) {
+    groundSteeringAngle = maxSteerRight;
   } else {
-    if (rearDistance < 0.3f) {
-      pedalPosition = 0.4f;
-    }
+    groundSteeringAngle = angle;
   }
 
-  if (leftDistance < rightDistance) {
-    if (leftDistance < 0.2f) {
-      groundSteeringAngle = 0.2f;
-    }
-  } else {
-    if (rightDistance < 0.2f) {
-      groundSteeringAngle = 0.2f;
-    }
+  //TODO: Use as command line arguments
+  // float pedalPositionDefault = 0.2f;
+  float maxPedalPosition = 0.5f;
+
+  // Simple Steering loop
+  // TODO: compute
+  // pedalPosition  = pedalPositionDefault/abs(groundSteeringAngle);
+  if (pedalPosition > maxPedalPosition) {
+    pedalPosition = maxPedalPosition;
   }
 
   {

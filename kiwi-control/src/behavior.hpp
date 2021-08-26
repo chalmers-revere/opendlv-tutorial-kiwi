@@ -40,6 +40,7 @@ class Behavior {
   void setRearUltrasonic(opendlv::proxy::DistanceReading const &) noexcept;
   void setLeftIr(opendlv::proxy::VoltageReading const &) noexcept;
   void setRightIr(opendlv::proxy::VoltageReading const &) noexcept;
+  void setAngleReading(opendlv::proxy::AngleReading const &) noexcept;
   void step() noexcept;
 
  private:
@@ -52,12 +53,14 @@ class Behavior {
   opendlv::proxy::VoltageReading m_rightIrReading;
   opendlv::proxy::GroundSteeringRequest m_groundSteeringAngleRequest;
   opendlv::proxy::PedalPositionRequest m_pedalPositionRequest;
+  opendlv::proxy::AngleReading m_angleReading;
   std::mutex m_frontUltrasonicReadingMutex;
   std::mutex m_rearUltrasonicReadingMutex;
   std::mutex m_leftIrReadingMutex;
   std::mutex m_rightIrReadingMutex;
   std::mutex m_groundSteeringAngleRequestMutex;
   std::mutex m_pedalPositionRequestMutex;
+  std::mutex m_angleReadingMutex;
 };
 
 #endif

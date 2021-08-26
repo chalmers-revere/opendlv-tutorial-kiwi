@@ -55,9 +55,19 @@ int32_t main(int32_t argc, char **argv) {
         }
       }};
 
+    auto onAngleReading{[&behavior](cluon::data::Envelope &&envelope)
+      {
+        auto angleReading = cluon::extractMessage<opendlv::proxy::AngleReading>(std::move(envelope));
+        uint32_t const senderStamp = envelope.senderStamp();
+        if (senderStamp == 0) {
+          behavior.setAngleReading(angleReading);
+        }
+      }};
+
     cluon::OD4Session od4{CID};
     od4.dataTrigger(opendlv::proxy::DistanceReading::ID(), onDistanceReading);
     od4.dataTrigger(opendlv::proxy::VoltageReading::ID(), onVoltageReading);
+    od4.dataTrigger(opendlv::proxy::AngleReading::ID(), onAngleReading);
 
     auto atFrequency{[&VERBOSE, &behavior, &od4]() -> bool
       {
