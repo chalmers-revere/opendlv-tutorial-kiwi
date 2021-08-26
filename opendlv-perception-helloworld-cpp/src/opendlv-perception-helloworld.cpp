@@ -109,6 +109,19 @@ cv::Point2f getMeanCoordinatesOfContours(std::vector<std::vector<cv::Point>> con
     return cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
 }
 
+cv::Point2f getMidpoint(cv::Point2f pt1, cv::Point2f pt2) {
+    /*
+    Return coordinate of a midpoint between pt1 and pt2
+    */
+    std::vector<cv::Point2f> points{pt1, pt2};
+    cv::Mat mean_;  
+    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
+    cv::Point2f midpoint(mean_.at<float>(0,0), mean_.at<float>(0,1));
+    return midpoint;
+}
+
+                
+
 
 int32_t main(int32_t argc, char **argv) {
     int32_t retCode{1};
@@ -270,14 +283,13 @@ int32_t main(int32_t argc, char **argv) {
                     meanYellow = cv::Point2f(-300, 150);
                 }
 
-                // Compute mean of means
-                std::vector<cv::Point2f> points{meanBlue, meanYellow};
-                cv::Mat mean_;  
-                cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
-                cv::Point2f mean(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                // Compute midpoint (Between mean of yellow cones and mean of blue cones)
+                cv::Point2f midpoint;
+                midpoint = getMidpoint(meanBlue, meanYellow);
 
-                // Draw line from bottom center to mean of means point
-                cv::line(crop_img, cv::Point2d(300, 210), mean, cv::Scalar(0, 0, 255), 5);
+
+                // Draw line from bottom center to midpoint
+                cv::line(crop_img, cv::Point2d(300, 210), midpoint, cv::Scalar(0, 0, 255), 5);
                            
 
                 // Display image.
@@ -303,7 +315,7 @@ int32_t main(int32_t argc, char **argv) {
                     // Print coordinates of mean points
                     std::cout<< "mean Yellow: " << meanYellow << std::endl; 
                     std::cout<< "mean Blue: " << meanBlue << std::endl; 
-                    std::cout<< "mean: " << mean << " xy:" <<  ij2xy(mean) << std::endl;
+                    std::cout<< "midpoint: " << midpoint << " xy:" <<  ij2xy(midpoint) << std::endl;
 
                     // cv::imshow(sharedMemory->name().c_str(), img);
                     // cv::imshow("Hough", hough);
