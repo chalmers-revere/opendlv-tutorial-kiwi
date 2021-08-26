@@ -29,12 +29,13 @@ services:
       - /tmp:/tmp
     environment:
       - DISPLAY=${DISPLAY}
-    command: "--cid=111 --verbose --name=img.argb /opt/recordings/yourFile.rec" # Change the filename here, the path should stay the same
+    command: "--cid=111 --name=img.argb /opt/recordings/2020-03-24_131923-video-all.rec" # Change the filename here, the path should stay the same
 
-  vehicle-view:
-    image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.60
-    restart: on-failure
-    network_mode: host
-    volumes:
-      - ~/recordings:/opt/vehicle-view/recordings 
-      - /var/run/docker.sock:/var/run/docker.sock
+#  vehicle-view:
+#    image: chalmersrevere/opendlv-vehicle-view-multi:v0.0.60
+#    restart: on-failure
+#    network_mode: host
+#    volumes:
+#      - ~/recordings:/opt/vehicle-view/recordings 
+#      - /var/run/docker.sock:/var/run/docker.sock
+      
