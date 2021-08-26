@@ -31,12 +31,11 @@
 // using namespace cv;
 
 
-cv::Mat dilate_erode(cv::Mat img) {
+cv::Mat dilate_erode(cv::Mat img, uint32_t ndilate, uint32_t nerode) {
     cv::Mat dilate;
-    uint32_t iterations{5};
-    cv::dilate(img, dilate, cv::Mat(), cv::Point(-1,-1), iterations, 1,1);
+    cv::dilate(img, dilate, cv::Mat(), cv::Point(-1,-1), ndilate, 1,1);
     cv::Mat erode;
-    cv::erode(dilate, erode, cv::Mat(), cv::Point(-1,-1), iterations, 1, 1);
+    cv::erode(dilate, erode, cv::Mat(), cv::Point(-1,-1), nerode, 1, 1);
 
     return erode;
 }
@@ -168,6 +167,8 @@ int32_t main(int32_t argc, char **argv) {
         cv::Scalar hsvHiYellow = toScalar(tokenize(commandlineArguments["yhigh"]));
         cv::Scalar hsvLowBlue = toScalar(tokenize(commandlineArguments["blow"]));
         cv::Scalar hsvHiBlue = toScalar(tokenize(commandlineArguments["bhigh"]));
+        const uint32_t NERODE{static_cast<uint32_t>(std::stoi(commandlineArguments["nerode"]))};
+        const uint32_t NDILATE{static_cast<uint32_t>(std::stoi(commandlineArguments["ndilate"]))};
 
         // For monitoring execution time
         using std::chrono::high_resolution_clock;
@@ -250,14 +251,14 @@ int32_t main(int32_t argc, char **argv) {
                 cv::inRange(hsv, hsvLowBlue, hsvHiBlue, blueCones);
 
                 // Dilate and erode to fill detected cones
-                cv::Mat blueConesMask = dilate_erode(blueCones);
+                cv::Mat blueConesMask = dilate_erode(blueCones, NERODE, NDILATE);
 
                 // Detect yellow coloured pixels
                 cv::Mat yellowCones;
                 cv::inRange(hsv, hsvLowYellow, hsvHiYellow, yellowCones);
 
                 // Dilate and erode to fill detected cones
-                cv::Mat yellowConesMask = dilate_erode(yellowCones);
+                cv::Mat yellowConesMask = dilate_erode(yellowCones, NERODE, NDILATE);
 
                 // Use Masks from cones as pre-filter for edge detection
                 cv::Mat combinedMask;

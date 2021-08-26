@@ -13,4 +13,5 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
     command: "--cid=111 --name=img.argb --width=1280 --height=640 --verbose
-    --ylow=15,50,50 --yhigh=40,255,255 --blow=110,50,50 --bhigh=130,255,255"
+    --ylow=15,50,50 --yhigh=40,255,255 --blow=110,50,50 --bhigh=130,255,255
+    --nerode=5 --ndilate=5"
