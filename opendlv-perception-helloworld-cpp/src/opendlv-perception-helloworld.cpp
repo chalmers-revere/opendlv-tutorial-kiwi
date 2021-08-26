@@ -26,7 +26,9 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <math.h> 
 #include <chrono>
+
 
 // using namespace cv;
 
@@ -63,7 +65,7 @@ cv::Mat drawContours(cv::Mat img, std::vector<std::vector<cv::Point>> contours, 
 }
 
 cv::Point2f ij2xy (cv::Point2f pt) {
-    // TODO: make adaptive
+    // TODO: make adaptive - use CROP_WIDTH and CROP_HEIGHT
     cv::Point2f origin(300.0 ,210.0);
     cv::Point2f xyPt(pt.x - origin.x, origin.y - pt.y);
 
@@ -163,6 +165,11 @@ int32_t main(int32_t argc, char **argv) {
         const uint32_t WIDTH{static_cast<uint32_t>(std::stoi(commandlineArguments["width"]))};
         const uint32_t HEIGHT{static_cast<uint32_t>(std::stoi(commandlineArguments["height"]))};
         const bool VERBOSE{commandlineArguments.count("verbose") != 0};
+        
+        const uint32_t CROP_WIDTH = 600;
+        const uint32_t CROP_HEIGHT = 210;
+        const uint32_t X_DISTANCE = 150;
+
         cv::Scalar hsvLowYellow = toScalar(tokenize(commandlineArguments["ylow"]));
         cv::Scalar hsvHiYellow = toScalar(tokenize(commandlineArguments["yhigh"]));
         cv::Scalar hsvLowBlue = toScalar(tokenize(commandlineArguments["blow"]));
@@ -175,6 +182,7 @@ int32_t main(int32_t argc, char **argv) {
         using std::chrono::duration_cast;
         using std::chrono::duration;
         using std::chrono::milliseconds;
+
 
         // Attach to the shared memory.
         std::unique_ptr<cluon::SharedMemory> sharedMemory{new cluon::SharedMemory{NAME}};
@@ -230,16 +238,16 @@ int32_t main(int32_t argc, char **argv) {
                 auto t1 = high_resolution_clock::now();
                 // TODO: Do something with the frame.
 
-                // Crop Image
+                // Crop Image //TODO: make adaptive, use CROP_WIDTH and CROP_HEIGHT
                 cv::Rect myROI(10, 10, 100, 100);
                 cv::Mat croppedImage = img(myROI);
 	            cv::Mat crop_img = img(cv::Range(300,720), cv::Range(40, 1240));
 
                 // Scale image
-                cv::resize(crop_img, crop_img, cv::Size(600,210), cv::INTER_LINEAR);
+                cv::resize(crop_img, crop_img, cv::Size(CROP_WIDTH,CROP_HEIGHT), cv::INTER_LINEAR);
 
                 // Drawing an ellipse over vehicle parts visible in camera feed
-                cv::ellipse(crop_img, cv::Point(300, 210), cv::Size(280, 55), 0, 0, 360, cv::Scalar(0, 255, 0),-1, cv::LINE_AA);
+                cv::ellipse(crop_img, cv::Point(300, CROP_HEIGHT), cv::Size(280, 55), 0, 0, 360, cv::Scalar(0, 255, 0),-1, cv::LINE_AA);
 
 
                 // Convert to HSV
@@ -316,7 +324,28 @@ int32_t main(int32_t argc, char **argv) {
 
 
                 // Draw line from bottom center to midpoint
+
+                cv::line(crop_img, cv::Point2d(300, CROP_HEIGHT), midpoint, cv::Scalar(255, 255, 0), 3);
+
+
+                // Project midpoint onto fixed-distance horizontal line
+                // midpoint.y corresponds to x-distance in local frame!!!
+                midpoint.y = CROP_HEIGHT - X_DISTANCE;
+
+                // Draw line from bottom center to projected midpoint
+                cv::line(crop_img, cv::Point2d(300, CROP_HEIGHT), midpoint, cv::Scalar(0, 0, 255), 5);
+                // Draw horizontal line
+                cv::line(crop_img, cv::Point2d(0, CROP_HEIGHT-X_DISTANCE), cv::Point2d(CROP_WIDTH, CROP_HEIGHT-X_DISTANCE), cv::Scalar(0, 0, 0), 1);
+
+                // Calculate Angle
+                // midpoint.x corresponds to y-distance in local frame!!!
+                
+                float angle = atan(ij2xy(midpoint).x/X_DISTANCE);
+                std::string str(std::to_string(angle));
+                cv::putText(crop_img,str,cv::Point(CROP_WIDTH/2,CROP_HEIGHT-X_DISTANCE),cv::FONT_HERSHEY_DUPLEX,1,cv::Scalar(0,0,255),2,false);
+               
                 cv::line(crop_img, cv::Point2d(300, 210), midpoint, cv::Scalar(0, 0, 255), 5);
+
 
                 // -------- Compute middle point end------------
 
@@ -345,6 +374,7 @@ int32_t main(int32_t argc, char **argv) {
                     std::cout<< "mean Yellow: " << meanYellow << std::endl;
                     std::cout<< "mean Blue: " << meanBlue << std::endl;
                     std::cout<< "midpoint: " << midpoint << " xy:" <<  ij2xy(midpoint) << std::endl;
+                    std::cout << "angle: " << angle << std::endl;
 
                     // Display image
                     cv::imshow("Cropped", crop_img);
