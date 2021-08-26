@@ -72,15 +72,6 @@ cv::Point2f ij2xy (cv::Point2f pt) {
     return xyPt;
 }
 
-// cv::Point2f xy2ij (cv::Point2f pt) {
-//     // TODO: make adaptive
-//     cv::Point2f origin(300.0 ,210.0);
-//     cv::Point2f ijPt(origin.x - pt.x, origin.y);
-
-//     return ijPt;
-// }
-
-
 cv::Point2f getContourCoordinates(std::vector<cv::Point> contour) {
     std::vector<cv::Point> contour_poly;
     cv::Point2f center;
