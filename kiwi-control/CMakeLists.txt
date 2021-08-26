@@ -83,10 +83,10 @@ target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 
 ################################################################################
 # Enable unit testing.
-enable_testing()
-add_executable(${PROJECT_NAME}-runner ${CMAKE_CURRENT_SOURCE_DIR}/test/test-behavior.cpp $<TARGET_OBJECTS:${PROJECT_NAME}-core>)
-target_link_libraries(${PROJECT_NAME}-runner ${LIBRARIES})
-add_test(NAME ${PROJECT_NAME}-runner COMMAND ${PROJECT_NAME}-runner)
+# enable_testing()
+# add_executable(${PROJECT_NAME}-runner ${CMAKE_CURRENT_SOURCE_DIR}/test/test-behavior.cpp $<TARGET_OBJECTS:${PROJECT_NAME}-core>)
+# target_link_libraries(${PROJECT_NAME}-runner ${LIBRARIES})
+# add_test(NAME ${PROJECT_NAME}-runner COMMAND ${PROJECT_NAME}-runner)
 
 ################################################################################
 # Install executable.

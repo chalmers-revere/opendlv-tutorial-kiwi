@@ -10,4 +10,4 @@ services:
     ipc: "host"
     volumes:
       - /tmp:/tmp
-    command: "--cid=111 --freq=10"
+    command: "--cid=111 --freq=10 --verbose"
