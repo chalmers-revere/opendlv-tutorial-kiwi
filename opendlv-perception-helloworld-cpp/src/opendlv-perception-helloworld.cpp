@@ -231,16 +231,6 @@ int32_t main(int32_t argc, char **argv) {
 
                 cv::Mat drawingYellow;
                 drawingYellow = drawContours(cannyYellow, contoursYellow, cv::Scalar(0,255,255));
-
-                if (VERBOSE) {
-                    if (contoursYellow.size() > 0){
-                        std::cout << "Yellow contours!" << std::endl;
-                        for ( size_t i = 0; i < contoursYellow.size(); i++) 
-                        {                        
-                            std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
-                        }
-                    }
-                }
                 
 
                 //---- contours of Blue Cones
@@ -249,16 +239,6 @@ int32_t main(int32_t argc, char **argv) {
 
                 cv::Mat drawingBlue;
                 drawingBlue = drawContours(cannyBlue, contoursBlue, cv::Scalar(255,0,0));
-
-                if (VERBOSE) {
-                    if (contoursBlue.size() > 0){
-                        std::cout << "Blue contours!" << std::endl;
-                        for ( size_t i = 0; i < contoursBlue.size(); i++) 
-                        {
-                            std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
-                        }
-                    }
-                }
 
 
                 // --- Compute middle point
@@ -273,43 +253,56 @@ int32_t main(int32_t argc, char **argv) {
                     cv::Mat mean_;  
                     cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
                     meanBlue = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
-                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
                 } else {
                     meanBlue = cv::Point2f(300, 150);
-                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
                 }
-
 
                 // // compute mean of yellow conescv::Point2f meanYellow;
                 cv::Point2f meanYellow;
                 if (contoursYellow.size() > 0) {
                     std::vector<cv::Point2f> points;
-
                     points = getAllContourCoordinates(contoursYellow);
-
                     cv::Mat mean_;  
                     cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
                     meanYellow = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
-                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
                 } else {
                     meanYellow = cv::Point2f(-300, 150);
-                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
                 }
 
-                // // Compute mean of means
+                // Compute mean of means
                 std::vector<cv::Point2f> points{meanBlue, meanYellow};
                 cv::Mat mean_;  
                 cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
                 cv::Point2f mean(mean_.at<float>(0,0), mean_.at<float>(0,1));
-                std::cout<< "mean: " << mean << " xy:" <<  ij2xy(mean) << std::endl;
 
-      
                 cv::line(crop_img, cv::Point2d(300, 210), mean, cv::Scalar(0, 0, 255), 5);
-                
-                
+                           
 
                 // Display image.
                 if (VERBOSE) {
+                    // Print coordinates of yellow contours
+                    if (contoursYellow.size() > 0){
+                        std::cout << "Yellow contours!" << std::endl;
+                        for ( size_t i = 0; i < contoursYellow.size(); i++) 
+                        {                        
+                            std::cout << "ij: " << getContourCoordinates(contoursYellow[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursYellow[i])) << std::endl;
+                        }
+                    }
+
+                    // Print coordinates of yellow contours
+                    if (contoursBlue.size() > 0){
+                        std::cout << "Blue contours!" << std::endl;
+                        for ( size_t i = 0; i < contoursBlue.size(); i++) 
+                        {
+                            std::cout << "ij: " << getContourCoordinates(contoursBlue[i]) << " xy: "<< ij2xy(getContourCoordinates(contoursBlue[i])) << std::endl;
+                        }
+                    }
+
+                    // Print coordinates of mean points
+                    std::cout<< "mean Yellow: " << meanYellow << std::endl; 
+                    std::cout<< "mean Blue: " << meanBlue << std::endl; 
+                    std::cout<< "mean: " << mean << " xy:" <<  ij2xy(mean) << std::endl;
+
                     // cv::imshow(sharedMemory->name().c_str(), img);
                     // cv::imshow("Hough", hough);
                     cv::imshow("Cropped", crop_img);
