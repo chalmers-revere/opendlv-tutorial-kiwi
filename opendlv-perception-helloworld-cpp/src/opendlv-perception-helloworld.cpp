@@ -98,6 +98,17 @@ std::vector<cv::Point2f> getAllContourCoordinates(std::vector<std::vector<cv::Po
     return centers;
 }
 
+cv::Point2f getMeanCoordinatesOfContours(std::vector<std::vector<cv::Point>> contours) {
+    /*
+    Return coordinates of mean of all contours in ij-system.
+    */
+    std::vector<cv::Point2f> points;
+    points = getAllContourCoordinates(contours);
+    cv::Mat mean_;  
+    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
+    return cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
+}
+
 
 int32_t main(int32_t argc, char **argv) {
     int32_t retCode{1};
@@ -246,13 +257,7 @@ int32_t main(int32_t argc, char **argv) {
                 // compute mean of blue cones
                 cv::Point2f meanBlue;
                 if (contoursBlue.size() > 0) {
-                    std::vector<cv::Point2f> points;
-
-                    points = getAllContourCoordinates(contoursBlue);
-
-                    cv::Mat mean_;  
-                    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
-                    meanBlue = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                    meanBlue = getMeanCoordinatesOfContours(contoursBlue);
                 } else {
                     meanBlue = cv::Point2f(300, 150);
                 }
@@ -260,11 +265,7 @@ int32_t main(int32_t argc, char **argv) {
                 // // compute mean of yellow conescv::Point2f meanYellow;
                 cv::Point2f meanYellow;
                 if (contoursYellow.size() > 0) {
-                    std::vector<cv::Point2f> points;
-                    points = getAllContourCoordinates(contoursYellow);
-                    cv::Mat mean_;  
-                    cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
-                    meanYellow = cv::Point2f(mean_.at<float>(0,0), mean_.at<float>(0,1));
+                    meanYellow = getMeanCoordinatesOfContours(contoursYellow);
                 } else {
                     meanYellow = cv::Point2f(-300, 150);
                 }
@@ -275,6 +276,7 @@ int32_t main(int32_t argc, char **argv) {
                 cv::reduce(points, mean_, 01, CV_REDUCE_AVG);
                 cv::Point2f mean(mean_.at<float>(0,0), mean_.at<float>(0,1));
 
+                // Draw line from bottom center to mean of means point
                 cv::line(crop_img, cv::Point2d(300, 210), mean, cv::Scalar(0, 0, 255), 5);
                            
 
