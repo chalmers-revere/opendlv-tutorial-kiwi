@@ -62,7 +62,7 @@ session.connect()
 ################################################################################
 # The following lines connect to the camera frame that resides in shared memory.
 # This name must match with the name used in the h264-decoder-viewer.yml file.
-name = "/tmp/video0.argb"
+name = "/tmp/img.argb"
 # Obtain the keys for the shared memory and semaphores.
 keySharedMemory = sysv_ipc.ftok(name, 1, True)
 keySemMutex = sysv_ipc.ftok(name, 2, True)
